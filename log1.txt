@@ -1,0 +1,163 @@
+
+C9800-WLC#show snmp-community
+                   ^
+% Invalid input detected at '^' marker.
+
+C9800-WLC#
+C9800-WLC#show snmp community
+
+Community name: ILMI
+Community Index: ILMI
+Community SecurityName: ILMI
+storage-type: read-only	 active
+
+
+Community name: private
+Community Index: private
+Community SecurityName: private
+storage-type: nonvolatile	 active
+
+
+Community name: private@0
+Community Index: private@0
+Community SecurityName: private
+storage-type: read-only	 active
+
+
+Community name: private@1
+Community Index: private@1
+Community SecurityName: private
+storage-type: read-only	 active
+
+
+Community name: private@100
+Community Index: private@100
+Community SecurityName: private
+storage-type: read-only	 active
+
+
+Community name: private@1002
+Community Index: private@1002
+Community SecurityName: private
+storage-type: read-only	 active
+
+
+Community name: private@1003
+Community Index: private@1003
+Community SecurityName: private
+storage-type: read-only	 active
+
+
+Community name: private@1004
+Community Index: private@1004
+Community SecurityName: private
+storage-type: read-only	 active
+
+
+Community name: private@1005
+Community Index: private@1005
+Community SecurityName: private
+storage-type: read-only	 active
+
+
+Community name: public
+Community Index: public
+Community SecurityName: public
+storage-type: nonvolatile	 active
+
+
+Community name: public@0
+Community Index: public@0
+Community SecurityName: public
+storage-type: read-only	 active
+
+
+Community name: public@1
+Community Index: public@1
+Community SecurityName: public
+storage-type: read-only	 active
+
+
+Community name: public@100
+Community Index: public@100
+Community SecurityName: public
+storage-type: read-only	 active
+
+
+Community name: public@1002
+Community Index: public@1002
+Community SecurityName: public
+storage-type: read-only	 active
+
+
+Community name: public@1003
+Community Index: public@1003
+Community SecurityName: public
+storage-type: read-only	 active
+
+
+Community name: public@1004
+Community Index: public@1004
+Community SecurityName: public
+storage-type: read-only	 active
+
+
+Community name: public@1005
+Community Index: public@1005
+Community SecurityName: public
+storage-type: read-only	 active
+
+
+C9800-WLC#
+C9800-WLC#show ip ospf neighbors
+                               ^
+% Invalid input detected at '^' marker.
+
+C9800-WLC#
+C9800-WLC#show ip ospf neighbor
+
+Neighbor ID     Pri   State           Dead Time   Address         Interface
+198.18.128.1      1   FULL/DR         00:00:32    198.18.128.1    GigabitEthernet1
+198.18.128.30     1   2WAY/DROTHER    00:00:30    198.18.128.30   GigabitEthernet1
+198.18.128.31     1   FULL/BDR        00:00:33    198.18.128.31   GigabitEthernet1
+C9800-WLC#
+
+
+C9800-WLC#^@
+C9800-WLC#
+C9800-WLC#show ap summary
+Number of APs: 2
+
+AP Name                            Slots    AP Model  Ethernet MAC    Radio MAC       Location                          Country     IP Address                                 State         
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+AP7069.5AEB.E424                     2      3802I     7069.5aeb.e424  28ac.9ed8.d020  default location                  US          172.16.100.104                             Registered    
+Floor2.AP.C9C0                       2      3802I     78bc.1adb.c9c0  683b.7850.d8e0  Global/United States/Texas/Richa  US          172.16.200.100                             Registered    
+
+C9800-WLC#
+C9800-WLC#show ap summary
+Number of APs: 2
+
+AP Name                            Slots    AP Model  Ethernet MAC    Radio MAC       Location                          Country     IP Address                                 State         
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+AP7069.5AEB.E424                     2      3802I     7069.5aeb.e424  28ac.9ed8.d020  default location                  US          172.16.100.104                             Registered    
+Floor2.AP.C9C0                       2      3802I     78bc.1adb.c9c0  683b.7850.d8e0  Global/United States/Texas/Richa  US          172.16.200.100                             Registered    
+
+C9800-WLC#
+C9800-WLC#show ap summary
+Number of APs: 2
+
+AP Name                            Slots    AP Model  Ethernet MAC    Radio MAC       Location                          Country     IP Address                                 State         
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+AP7069.5AEB.E424                     2      3802I     7069.5aeb.e424  28ac.9ed8.d020  default location                  US          172.16.100.104                             Registered    
+Floor2.AP.C9C0                       2      3802I     78bc.1adb.c9c0  683b.7850.d8e0  Global/United States/Texas/Richa  US          172.16.200.100                             Registered    
+
+C9800-WLC#
+C9800-WLC#show ap summary
+Number of APs: 2
+
+AP Name                            Slots    AP Model  Ethernet MAC    Radio MAC       Location                          Country     IP Address                                 State         
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+AP7069.5AEB.E424                     2      3802I     7069.5aeb.e424  28ac.9ed8.d020  default location                  US          172.16.100.104                             Registered    
+Floor2.AP.C9C0                       2      3802I     78bc.1adb.c9c0  683b.7850.d8e0  Global/United States/Texas/Richa  US          172.16.200.100                             Registered    
+
+C9800-WLC#

@@ -1,0 +1,49 @@
+C9800-WLC(config)#ap 78bc.1adb.c9c0
+C9800-WLC(config-ap-tag)#?
+  default     Set a command to its defaults
+  exit        Exit sub-mode
+  no          Negate a command or set its defaults
+  policy-tag  Map a Policy tag to the AP(AP will re-join)
+  rf-tag      Map a RF tag to the AP(AP will re-join)
+  site-tag    Map a Site tag to the AP(AP will re-join)
+
+-------
+command is in priv exec, not global config
+
+#show ap summary
+
+#ap name <current name> name <new name>
+AP7069.5AEB.E424   NewName.AP.E424
+--
+output = conn.send_command("show snmp community", use_textfsm=True, textfsm_template="./templates/cisco_ios_show_snmp_community.textfsm")
+-------
+
+
+----------------------------------------
+
+ap location name cx-dcloud
+ ap-eth-mac 78bc.1adb.c9c0
+ tag policy cx-dcloud
+ tag rf cx-dcloud
+ tag site cx-dcloud
+ 
+ ap 5c5a.c7f0.78c6
+ policy-tag cx-dcloud
+ rf-tag cx-dcloud
+ site-tag cx-dcloud
+ap 7069.5aeb.e424
+ policy-tag PT_Richa_HQ_Floor1_552dc
+ rf-tag TYPICAL
+ap 78bc.1adb.c9c0
+ policy-tag cx-dcloud
+ rf-tag cx-dcloud
+ site-tag cx-dcloud
+----
+ap 5c5a.c7f0.78c6
+ap 7069.5aeb.e424
+ policy-tag PT_Richa_HQ_Floor1_552dc
+ rf-tag TYPICAL
+ap 78bc.1adb.c9c0
+ policy-tag cx-dcloud
+ rf-tag cx-dcloud
+ site-tag cx-dcloud

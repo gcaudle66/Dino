@@ -1,0 +1,93 @@
+### Take a 2D array as input to your DataFrame 
+##my_2darray = np.array([[1, 2, 3], [4, 5, 6]])
+##print(pd.DataFrame(my_2darray))
+##
+### Take a dictionary as input to your DataFrame 
+##my_dict = {1: ['1', '3'], 2: ['1', '2'], 3: ['2', '4']}
+##print(pd.DataFrame(my_dict))
+##
+### Take a DataFrame as input to your DataFrame 
+##my_df = pd.DataFrame(data=[4,5,6,7], index=range(0,4), columns=['A'])
+##print(pd.DataFrame(my_df))
+##
+### Take a Series as input to your DataFrame
+##my_series = pd.Series({"United Kingdom":"London", "India":"New Delhi", "United States":"Washington", "Belgium":"Brussels"})
+##print(pd.DataFrame(my_series))
+##print(pd.DataFrame(data=data[1:,1:],
+##		   index=data[1:,0],
+##		   columns=data[0,1:]))
+##
+##data = numpy.array([['','Col1','Col2'],
+##                ['Row1',1,2],
+##                ['Row2',3,4]])
+##apName = ""
+##macAddr = ""
+##results = np.array([["APname", "Mac"],
+##                    ["Row",apName,macAddr]])
+##with open('name.csv', 'rt') as f:
+##    reader = csv.reader(f)
+##    output = []
+##    for row in reader:
+##	    output.append(row)
+
+------PARSING WITH TXTFSM
+>>> template = open('cisco_ios_show_version.template')
+>>> results_template = textfsm.TextFSM(template)
+>>> dir(results_template)
+['GetValuesByAttrib', 'MAX_NAME_LEN', 'ParseText', 'Reset', '_AppendRecord', '_AssignVar', '_CheckLine', '_CheckRule', '_ClearAllRecord', '_ClearRecord', '_DEFAULT_OPTIONS', '_GetHeader', '_GetValue', '_Operations', '_Parse', '_ParseFSMState', '_ParseFSMVariables', '_ValidateFSM', '_ValidateOptions', '__class__', '__delattr__', '__dict__', '__doc__', '__format__', '__getattribute__', '__hash__', '__init__', '__module__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_cur_state', '_cur_state_name', '_line_num', '_options_cls', '_result', 'comment_regex', 'header', 'state_list', 'state_name_re', 'states', 'value_map', 'values']
+
+>>> results_template.value_map
+{'UPTIME': '(?P<UPTIME>.+)', 'HOSTNAME': '(?P<HOSTNAME>\\S+)', 'RUNNING_IMAGE': '(?P<RUNNING_IMAGE>\\S+)', 'CONFIG_REGISTER': '(?P<CONFIG_REGISTER>\\S+)', 'HARDWARE': '(?P<HARDWARE>\\S+\\d\\S+)', 'VERSION': '(?P<VERSION>.+?)', 'SERIAL': '(?P<SERIAL>\\S+)', 'ROMMON': '(?P<ROMMON>\\S+)'}
+
+>>> results_template.values
+[<textfsm.TextFSMValue object at 0x107c0ac90>, <textfsm.TextFSMValue object at 0x107c181d0>, <textfsm.TextFSMValue object at 0x107c18450>, <textfsm.TextFSMValue object at 0x107cf1750>, <textfsm.TextFSMValue object at 0x107cf1790>, <textfsm.TextFSMValue object at 0x107cf17d0>, <textfsm.TextFSMValue object at 0x107cf18d0>, <textfsm.TextFSMValue object at 0x107cf1950>]
+
+>>> content2parse = open('lab-swtich-show-cmds.txt')
+>>> content = content2parse.read()
+
+>>> parsed_results = results_template.ParseText(content)
+>>> parsed_results
+[['15.2(2)E3', 'Bootstrap', 'artic-sw01', '4 days, 14 hours, 2 minutes', 'c2960s-universalk9-mz.152-2.E3.bin', ['WS-C2960S-24TS-S'], ['FOC1709W1DT'], '0xF']]
+
+
+Your first inclination might be to iterate over the results but remember that its a list of lists so iterating over the results
+would iterate over the only item in the "top level" list [0]. What you want is to iterate over each element of the results list
+which is also a list. I know that my top level list has 1 element, the [0] element, and that list has 8 elements.  We only parsed one file which is why our list only has one element.  If I iterate 
+over the [0] element of the list I get each individual bit of information.
+
+Get the length of the top level list (should only have one element since we only parsed 1 file)
+>>> len(parsed_results)
+1
+Get the length of that first element
+>>> len(parsed_results[0])
+8
+>>> for item in parsed_results:
+... print(item)
+...
+['15.2(2)E3', 'Bootstrap', 'artic-sw01', '4 days, 14 hours, 2 minutes', 'c2960s-universalk9-mz.152-2.E3.bin', ['WS-C2960S-24TS-S'], ['FOC1709W1DT'], '0xF']
+
+>>> index = 0
+>>> for item in parsed_results[0]:
+... print("Element # {}: {}".format(index,item))
+... index = index + 1
+...
+Element # 0: 15.2(2)E3
+Element # 1: Bootstrap
+Element # 2: artic-sw01
+Element # 3: 4 days, 14 hours, 2 minutes
+Element # 4: c2960s-universalk9-mz.152-2.E3.bin
+Element # 5: ['WS-C2960S-24TS-S']
+Element # 6: ['FOC1709W1DT']
+Element # 7: 0xF
+>>>
+
+
+I know I have 8 elements (0-7) because i checked the length and if you do a length on the value_map you can see 
+that the template is designed to get 8 pieces of information so that makes sense.
+
+Get the length of the first list
+>>> len(parsed_results[0])
+8
+Get the length of the value map
+>>> len(results_template.value_map)
+8

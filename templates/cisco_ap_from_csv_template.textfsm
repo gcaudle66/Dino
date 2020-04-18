@@ -1,0 +1,7 @@
+Value IDENTIFIER (.+?)
+Value NAME (.+?)
+
+Start
+  ^AP\sName${NAME},Ethernet\sMAC${IDENTIFIER}\s+\b$$ -> Record
+  ^AP\sName,Ethernet\sMAC\b.*$$
+  ^. -> Error
