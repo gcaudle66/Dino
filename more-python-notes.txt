@@ -31,6 +31,8 @@
 ##	    output.append(row)
 
 ------PARSING WITH TXTFSM
+^.+?\b\s[a-fA-F0-9:\.]{12,17}\s  (Saved at https://regex101.com/r/YR61et/1)
+^(.+?)(,|\s)([a-fA-F0-9:\.]{12,17})(,|\s)	https://regex101.com/r/YR61et/2
 >>> template = open('cisco_ios_show_version.template')
 >>> results_template = textfsm.TextFSM(template)
 >>> dir(results_template)
