@@ -21,7 +21,10 @@ def draw_df(*args):
 
 ## Temp Data to avoid the reconnects
 cli_parsed = ([{'ap_name': ': Floor2.AP.C9C0', 'mac_address': ': 683b.7850.d8e0'},
-            {'ap_name': ': AP7069.5AEB.E424', 'mac_address': ': 28ac.9ed8.d020'}])
+            {'ap_name': ': AP7069.5AEB.E424', 'mac_address': ': 28ac.9ed8.d020'},
+            {'ap_name': ': AP7069.5AEB.E424', 'mac_address': ': 28ac.9ed8.d020'},
+            {'ap_name': ': AP6C41.0E17.035C', 'mac_address': ': 6c:41:0e:17:03:5c'},
+            {'ap_name': ': AP6C41.1E17.3BCC', 'mac_address': ': 6C410E173BCC'}])
 
 connArgs = {
     "ip": "198.18.134.100",
@@ -40,7 +43,7 @@ def connect(connArgs):
     return conn
 
 def getApCli(conn):
-    cli_out = conn.send_command("show ap config general | include Cisco AP Name|Identifier", use_textfsm=True, textfsm_template="./templates/cisco_ios_show_ap_template.textfsm")
+    cli_out = conn.send_command("show ap config general | include Cisco AP Name|MAC Address", use_textfsm=True, textfsm_template="./templates/cisco_ios_show_ap_template.textfsm")
     return cli_out, conn
 
 def parseCSV():
@@ -51,11 +54,19 @@ def parseCSV():
         parsedCSV_results = results_template.ParseText(content)
     return parsedCSV_results
 
+def parseCLI():
+    with open('./templates/cisco_ios_show_ap_template.textfsm') as template:
+        results_template = textfsm.TextFSM(template)
+        content2parse = (cli_parsed)
+        content = content2parse #.read()
+        parsedCLI_results = results_template.ParseText(content)
+    return parsedCLI_results
+
 def iterateParsedCSV(parsedCSV_results):
     print(len(parsedCSV_results))
-    iteratedCSV = []
+    iteratedCSV = {}
     index = 0
     for item in parsedCSV_results:
-        iteratedCSV.append("Element # {}: {}".format(index,item))
+        print("Element # {}: {}".format(index,item))
         index = index + 1
     return iteratedCSV

@@ -1,0 +1,24 @@
+Cisco AP Name   : AP6C41.0E16.F6A8
+MAC Address                                     : 6c41.0e16.f6a8
+Cisco AP Name   : AP6C41.0E16.F77C
+MAC Address                                     : 6c41.0e16.f77c
+Cisco AP Name   : AP6C41.0E16.F79C
+MAC Address                                     : 6c41.0e16.f79c
+Cisco AP Name   : AP6C41.0E16.F85C
+MAC Address                                     : 6c41.0e16.f85c
+Cisco AP Name   : AP6C41.0E16.F954
+MAC Address                                     : 6c41.0e16.f954
+Cisco AP Name   : AP6C41.0E16.F958
+MAC Address                                     : 6c41.0e16.f958
+Cisco AP Name   : AP6C41.0E16.F9F0
+MAC Address                                     : 6c41.0e16.f9f0
+Cisco AP Name   : AP6C41.0E16.FA48
+MAC Address                                     : 6c41.0e16.fa48
+Cisco AP Name   : AP6C41.0E16.FAF8
+MAC Address                                     : 6c41.0e16.faf8
+Cisco AP Name   : AP6C41.0E16.FB8C
+MAC Address                                     : 6c41.0e16.fb8c
+Cisco AP Name   : dllctx04apnpz01v287a
+MAC Address                                     : f4bd.9e9b.a0fc
+Cisco AP Name   : dllctx04apnpz01v287b
+MAC Address                                     : f4bd.9e9b.9eb4
