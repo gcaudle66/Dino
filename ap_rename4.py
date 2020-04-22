@@ -1,9 +1,6 @@
-import pandas as pd
-import numpy as np
 import csv
 import netmiko as nm
 import textfsm
-import argparse
 import os
 global final_CSVresults
 global final_CLIresults
@@ -17,11 +14,6 @@ final_CSVresults = []
 final_CLIresults = []
 savedCredentials = False
 
-
-###connArgs = {
-##    "ip": "198.18.134.100",
-##    "user": "admin",
-##     "pass": "C1sco12345"}
 
 def main():
     """ Validate that we have imported CSV and CLI """
