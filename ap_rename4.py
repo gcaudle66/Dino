@@ -8,23 +8,21 @@ import os
 global final_CSVresults
 global final_CLIresults
 global conn
+global connArgs
 global __name__
+global matches
+matches = []
+connArgs = {}
 final_CSVresults = []
 final_CLIresults = []
+savedCredentials = False
 
 
-## Temp Data to avoid the reconnects
-#cli_parsed = ([{'ap_name': ': Floor2.AP.C9C0', 'mac_address': ': 683b.7850.d8e0'},
-##            {'ap_name': ': AP7069.5AEB.E424', 'mac_address': ': 28ac.9ed8.d020'},
-##            {'ap_name': ': AP7069.5AEB.E424', 'mac_address': ': 28ac.9ed8.d020'},
-##            {'ap_name': ': AP6C41.0E17.035C', 'mac_address': ': 6c:41:0e:17:03:5c'},
-##            {'ap_name': ': AP6C41.1E17.3BCC', 'mac_address': ': 6C410E173BCC'}])
-##
 ###connArgs = {
 ##    "ip": "198.18.134.100",
 ##    "user": "admin",
 ##     "pass": "C1sco12345"}
-##
+
 def main():
     """ Validate that we have imported CSV and CLI """
     """ data and do comparison                     """
@@ -82,12 +80,104 @@ def main3():
           "-------------------------------------------\n")
     global final_CSVresults
     global final_CLIresults
-    print(final_CSVresults)
-    print(final_CLIresults)
+    global matches
+    global conn
+    compare(final_CSVresults, final_CLIresults)
+    matches_len = len(matches)
+    if matches_len > 0:
+          print("-------------------------------------------\n" \
+                "Listed below are the matches found between \n" \
+                "CSV and CLI. Listed as ...                 \n" \
+                " [matched MAC, {Old AP Name, New AP Name}] \n" \
+                "-------------------------------------------\n")
+          for entry in range(len(matches)):
+            print(matches[entry], sep=",")
+    else:
+        print("No matches were found between the CSV \n" \
+              "and CLI results.                      \n")
+    choice = int(input("Does this info look correct? 1=Yes | 2=No or Ctrl-C to exit : "))
+    if choice == 1:
+        create_commands(matches)
+    elif choice == 2:
+        main()
+    
+
+def create_commands(matches):
+    """ Here we will pull in the matches from main3 """
+    """ and create the commands to rename each AP   """
+    """ on the WLC and place them in the list named """
+    """ cli_commands to then pass to netmiko.       """
+    global conn
+    cli_commands = []
+    index = 0
+    cmd2 = "show ap config general | include ^Cisco AP Name|^MAC Address"
+    for entry in range(len(matches)):
+        cmd_old_name = matches[index][1].get("Old_Name")
+        cmd_new_name = matches[index][1].get("New_Name")
+        cmd1 = f"ap name {cmd_old_name} name {cmd_new_name}"
+        cli_commands.append(cmd1)
+        index = index + 1
+    cli_commands.append(cmd2)
+    print(cli_commands)
+    return send_renameCmds(cli_commands)
+
+def compare(final_CSVresults, final_CLIresults):
+    """ First we create 2 lists, 1 for matches and 1 for """
+    """ no-match. Then create another list with matched  """
+    """ MACs with a nested dict with old_name/new_name   """
+    """ which will be base for command build.            """
     match = []
     no_match = []
-    choice = input("Does this info look correct? :")
-
+    global matches
+    ## Here we check the length of each list and pad the lesser
+    ## list with null pad entries to prevent throwing an index
+    ## error when looping
+    pad = ['null', 'inserted for padding']
+    cli_len = len(final_CLIresults)
+    csv_len = len(final_CSVresults)
+    if cli_len > csv_len:
+        diff = cli_len - csv_len
+        for x in range(diff):
+            final_CSVresults.append(pad)
+    elif csv_len > cli_len:
+        diff = csv_len - cli_len
+        for x in range(diff):
+            final_CLIresults.append(pad)
+    else:
+        print("No Diff, no need to pad")
+    ## Here we loop through both lists looking for matching
+    ## MACs and add them to lists for matches and no-match
+    index = 0
+    for item in range(len(final_CSVresults)):
+        csvi = final_CSVresults[index][1]
+        clii = final_CLIresults[index][1]
+        if csvi == clii:
+            print("Match")
+            mentry = [final_CSVresults[index], final_CLIresults[index]]
+            match.append(mentry)
+            index = index + 1
+    else:
+        print("No match")
+        nentry = mentry = [final_CSVresults[index], final_CLIresults[index]]
+        no_match.append(nentry)
+        index = index + 1
+    ## Here we will loop through matches and create a final
+    ## list "matches" that has lists with nested DICTs with
+    ## the old_name/new_name key:value pairs
+    index = 0
+    for item in range(len(match)):
+        old_name = match[index][1][0]
+        new_name = match[index][0][0]
+        mac1 = match[index][0][1]
+        mac2 = match[index][1][1]
+        if mac1 == mac2:
+            mentry = [mac1, {"Old_Name": old_name, "New_Name": new_name}]
+            matches.append(mentry)
+            index = index + 1
+    else:
+        print("Done Inserting Matches")
+        print(matches, sep="\n")
+    
 
 def importCSV(file_list):
     """ Choose file to import """
@@ -109,20 +199,6 @@ def importCSV(file_list):
     csv_choice = choices_list[choice]
     return parseCSV(csv_choice)
 
-##def scan_for_csv():
-##    """ Scan current directory for any file ending in csv """
-##    print("-------------------------------------------\n" \
-##          "Scanning current directory for CSV files...\n" \
-##          "-------------------------------------------\n")
-##    cwd = os.getcwd()
-##    with os.scandir(path=cwd) as it:
-##        file_list = []
-##        for entry in it:
-##            if entry.name.endswith(".csv") and entry.is_file():
-##                file_list.append(entry.name)
-##    file_len = len(file_list)
-##    print(f"Located {file_len} CSV files.")
-##    return importCSV(file_list)
 
 def get_conn_args():
     """ Gather connection related Args and pass to Netmiko """
@@ -130,6 +206,8 @@ def get_conn_args():
                                      #"related arguments such as username to build the " \
                                      #" SSH connection to the WLC.                     ")
     #parser.add_argument(divmod
+    global connArgs
+    global savedCredentials
     print("Lets gather info for the WLC we will connect to....")
     connArgs = {
     "ip": input("Enter IP address of WLC: "),
@@ -138,25 +216,29 @@ def get_conn_args():
     correct = False
     print(connArgs)
     choice = 0
-    choice = int(input("Is the above connection info correct? 1=Yes, 2=No  :"))
+    choice = int(input("Is the above connection info correct? 1=Yes, 2=No  : "))
     while correct == False:
         if choice == 1:
             correct = True
+            savedCredentials = True
             pass
         elif choice == 2:
                 get_conn_args()
         else:
             print("Invalid choice. Please try again or ctrl-c to exit")
             get_connArgs()
-    return connect(connArgs)        
+    return connect(connArgs), conn, connArgs
 
 def connect(connArgs):
+    global conn
     expPrompt = False
     connex = False
-    conn = nm.BaseConnection(ip=connArgs["ip"], username=connArgs["user"], password=connArgs["pass"])
+    conn = nm.BaseConnection(ip=connArgs["ip"], username=connArgs["user"], password=connArgs["pass"], session_log="ssh_session_logfile.txt", session_log_file_mode="write", session_log_record_writes="True")
     getPrompt = conn.find_prompt()
-    print("CONNECTED via SSH- \n" \
-          "Device returned :" + getPrompt)
+    print("-------------------------------------------\n" \
+          "CONNECTED via SSH- \n" \
+          f"Device returned : {getPrompt}               \n" \
+          "-------------------------------------------\n")
     while expPrompt is False:
         choice = 0
         choice = int(input("Is the above CLI prompt the prompt you were\n" \
@@ -169,11 +251,49 @@ def connect(connArgs):
         elif choice == 2:
             return get_conn_args()
 
+
 def getApCli(conn):
     alive = conn.is_alive()
     if alive == True:
         cli_output = conn.send_command("show ap config general | include ^Cisco AP Name|^MAC Address", use_textfsm=True, textfsm_template="./templates/cisco_ios_show_ap_template-v2.textfsm")
     return parseCLI(cli_output)
+
+def send_renameCmds(cli_commands):
+    """ Here we send the contents of the cli_commands """
+    """ list to the WLC via Netmiko active connection """
+    """ If conn is dead, we will open a new one.      """
+    global conn
+    global connArgs
+    global savedCredentials
+    is_connActive = False
+    is_connActive = conn.is_alive()
+    while is_connActive is False:
+        print("The SSH session to the WLC has closed. \n")
+        if savedCredentials is True:
+            print(connArgs)
+            print("Reopeneing connection using saved info above...")
+            conn = nm.BaseConnection(ip=connArgs["ip"], username=connArgs["user"], password=connArgs["pass"])
+            getPrompt = conn.find_prompt()
+            is_connActive = conn.is_alive()
+        else:
+            print("Error")
+    conn.send_config_set(config_commands=cli_commands, enter_config_mode=False, cmd_verify=False, exit_config_mode=False)
+    conn.disconnect()
+    print("-------------------------------------------\n" \
+          "Commands sent and logfile is printed below \n" \
+          "The logfile is also save locally in the    \n" \
+          "current dir as ssh_session_logfile.txt     \n" \
+          "-------------------------------------------\n")
+    with open("ssh_session_logfile.txt") as log:
+        read = log.readlines()
+        for line in read:
+            print(line)
+    print("-------------------------------------------\n" \
+          "Script Closing and exiting. SSH Closed     \n" \
+          "The logfile is also save locally in the    \n" \
+          "current dir as ssh_session_logfile.txt     \n" \
+          "-------------------------------------------\n")
+    
 
 def parseCSV(csv_choice):
     with open('./templates/cisco_ap_from_csv_template.textfsm') as template:
