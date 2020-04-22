@@ -1,3 +1,18 @@
+4/20-Working local parsing >>> with open('./templates/cisco_ios_show_ap_template-v2.textfsm') as template:
+        results_template = textfsm.TextFSM(template)
+        content2parse = open("./misc/attSample.txt")
+        content = content2parse.read()
+        parsedCLI_results = results_template.ParseText(content)
+
+        
+>>> parsedCLI_results
+[['AP6C41.0E16.F6A8', '6c41.0e16.f6a8'], ['AP6C41.0E16.F77C', '6c41.0e16.f77c'], ['AP6C41.0E16.F79C', '6c41.0e16.f79c'], ['AP6C41.0E16.F85C', '6c41.0e16.f85c'], ['AP6C41.0E16.F954', '6c41.0e16.f954'], ['AP6C41.0E16.F958', '6c41.0e16.f958'], ['AP6C41.0E16.F9F0', '6c41.0e16.f9f0'], ['AP6C41.0E16.FA48', '6c41.0e16.fa48'], ['AP6C41.0E16.FAF8', '6c41.0e16.faf8'], ['AP6C41.0E16.FB8C', '6c41.0e16.fb8c'], ['dllctx04apnpz01v287a', 'f4bd.9e9b.a0fc'], ['dllctx04apnpz01v287b', 'f4bd.9e9b.9eb4']]
+>>> parsedCSV_results = parseCSV()
+>>> parsedCSV_results
+[['dllstxatapn01v281a', '6c:41:0e:17:03:5c'], ['DLLCTX04APN02V088A', '6C410E173BCC'], ['DLLCTX04APN02V088B', '6C410E175FBC'], ['DLLCTX04APN02V088C', '6C410E173BCA'], ['DLLCTX04APN02V088D', '6C410E175FBB'], ['DLLCTX04APN02V088E', 'f4bd.9e9b.a0fc'], ['DLLCTX04APN02V088F', 'f4bd.9e9b.9eb4']]
+
+
+
 ### Take a 2D array as input to your DataFrame 
 ##my_2darray = np.array([[1, 2, 3], [4, 5, 6]])
 ##print(pd.DataFrame(my_2darray))
