@@ -118,7 +118,6 @@ def create_commands(matches):
         cli_commands.append(cmd1)
         index = index + 1
     cli_commands.append(cmd2)
-    print(cli_commands)
     return send_renameCmds(cli_commands)
 
 def compare(final_CSVresults, final_CLIresults):
