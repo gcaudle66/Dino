@@ -196,10 +196,6 @@ def importCSV(file_list):
 
 def get_conn_args():
     """ Gather connection related Args and pass to Netmiko """
-    #parser = argparse.ArgumentParser(description="This parser is to gather connection " \
-                                     #"related arguments such as username to build the " \
-                                     #" SSH connection to the WLC.                     ")
-    #parser.add_argument(divmod
     global connArgs
     global savedCredentials
     print("Lets gather info for the WLC we will connect to....")
@@ -215,18 +211,65 @@ def get_conn_args():
         if choice == 1:
             correct = True
             savedCredentials = True
-            pass
+            return connArgs
         elif choice == 2:
                 get_conn_args()
         else:
             print("Invalid choice. Please try again or ctrl-c to exit")
             get_connArgs()
-    return connect(connArgs), conn, connArgs
 
-def connect(connArgs):
+
+def connect2():
     global conn
+    global connArgs
+    global savedCredentials
     expPrompt = False
-    connex = False
+    while savedCredentials is False:
+	    connArgs = get_conn_args()
+    try:
+        conn = nm.BaseConnection(ip=connArgs["ip"], username=connArgs["user"], password=connArgs["pass"])
+    except nm.NetMikoTimeoutException:
+        print("Timeout Error occured. Check IP address and try Again")
+        connArgs = get_conn_args()
+        connect2()
+    except nm.NetMikoAuthenticationException:
+        print("Auth Error occured. Check Username/Password and try again.")
+        connArgs = get_conn_args()
+        connect2()
+    except:
+        print("Unexpected error:", sys.exc_info()[0])
+        raise
+    else:
+        alive = conn.is_alive()
+        if alive is True:
+            print("Connection Successful!")
+            getPrompt = conn.find_prompt()
+            print("-------------------------------------------\n" \
+                  "CONNECTED via SSH- \n" \
+                  f"Device returned : {getPrompt}               \n" \
+                  "-------------------------------------------\n")
+            while expPrompt is False:
+                choice = 0
+                choice = int(input("Is the above CLI prompt the prompt you were\n" \
+                                   "expecting from the correct WLC in exec mode? \n" \
+                                   "1= Yes | 2=No or Ctrl-C to quit :  "))
+                if choice == 1:
+                    expPrompt = True
+                    return conn
+                elif choice == 2:
+                    savedCredentials = False
+                    connect2()
+        else:
+            print("Failure: Unknown Error. Sorry")
+
+
+def connect():
+    global conn
+    global connArgs
+    global savedCredentials
+    expPrompt = False
+    while savedCredentials is False:
+	    connArgs = get_conn_args()
     conn = nm.BaseConnection(ip=connArgs["ip"], username=connArgs["user"], password=connArgs["pass"], session_log="ssh_session_logfile.txt", session_log_file_mode="write", session_log_record_writes="True")
     getPrompt = conn.find_prompt()
     print("-------------------------------------------\n" \
@@ -239,8 +282,6 @@ def connect(connArgs):
                            "expecting from the correct WLC in exec mode? \n" \
                            "1= Yes | 2=No or Ctrl-C to quit :  "))
         if choice == 1:
-            no_paging = conn.disable_paging()
-            print("Disabling paging and setting Terminal Width: set to :" + no_paging)
             return conn
         elif choice == 2:
             return get_conn_args()
@@ -249,6 +290,7 @@ def connect(connArgs):
 def getApCli(conn):
     alive = conn.is_alive()
     if alive == True:
+        no_paging = conn.disable_paging()
         cli_output = conn.send_command("show ap config general | include ^Cisco AP Name|^MAC Address", use_textfsm=True, textfsm_template="./templates/cisco_ios_show_ap_template-v2.textfsm")
     return parseCLI(cli_output)
 
@@ -271,6 +313,7 @@ def send_renameCmds(cli_commands):
             is_connActive = conn.is_alive()
         else:
             print("Error")
+    no_paging = conn.disable_paging()
     conn.send_config_set(config_commands=cli_commands, enter_config_mode=False, cmd_verify=False, exit_config_mode=False)
     conn.disconnect()
     print("-------------------------------------------\n" \
