@@ -1,5 +1,6 @@
 import csv
 import netmiko as nm
+from netmiko import ConnectHandler
 import textfsm
 import os
 global final_CSVresults
@@ -13,6 +14,7 @@ connArgs = {}
 final_CSVresults = []
 final_CLIresults = []
 savedCredentials = False
+conn = 0
 
 
 def main():
@@ -63,7 +65,8 @@ def main2():
           " connected and Registered APs.\n" \
           "-------------------------------------------\n")
     get_conn_args()
-    getApCli(conn)
+    conn = connect()
+    cli_output = getApCli()
     
 
 def main3():
@@ -141,20 +144,12 @@ def compare(final_CSVresults, final_CLIresults):
         print("No Diff, no need to pad")
     ## Here we loop through both lists looking for matching
     ## MACs and add them to lists for matches and no-match
-    index = 0
-    for item in range(len(final_CSVresults)):
-        csvi = final_CSVresults[index][1]
-        clii = final_CLIresults[index][1]
-        if csvi == clii:
-            print("Match")
-            mentry = [final_CSVresults[index], final_CLIresults[index]]
-            match.append(mentry)
-            index = index + 1
-    else:
-        print("No match")
-        nentry = mentry = [final_CSVresults[index], final_CLIresults[index]]
-        no_match.append(nentry)
-        index = index + 1
+    for x, y in [(x,y) for x in final_CSVresults for y in final_CLIresults]:
+        print(x[1], y[1])
+        if x[1] == y[1]:
+            hit = [x, y]
+            print("Match:" + x[1] + " " + y[1])
+            match.append(hit)
     ## Here we will loop through matches and create a final
     ## list "matches" that has lists with nested DICTs with
     ## the old_name/new_name key:value pairs
@@ -219,7 +214,7 @@ def get_conn_args():
             get_connArgs()
 
 
-def connect2():
+def connect():
     global conn
     global connArgs
     global savedCredentials
@@ -227,15 +222,14 @@ def connect2():
     while savedCredentials is False:
 	    connArgs = get_conn_args()
     try:
-        conn = nm.BaseConnection(ip=connArgs["ip"], username=connArgs["user"], password=connArgs["pass"])
+        conn = ConnectHandler(ip=connArgs["ip"], username=connArgs["user"], password=connArgs["pass"], device_type="cisco_ios", session_log="ssh_session_logfile.txt", session_log_file_mode="write", session_log_record_writes="True")
     except nm.NetMikoTimeoutException:
-        print("Timeout Error occured. Check IP address and try Again")
+        print("<--> Timeout Error occured <--> Check IP address and try Again")
         connArgs = get_conn_args()
-        connect2()
+        conn = connect()
     except nm.NetMikoAuthenticationException:
-        print("Auth Error occured. Check Username/Password and try again.")
-        connArgs = get_conn_args()
-        connect2()
+        print("<--> Auth Error occured <--> Check Username/Password and try again.")
+        main2()
     except:
         print("Unexpected error:", sys.exc_info()[0])
         raise
@@ -258,40 +252,32 @@ def connect2():
                     return conn
                 elif choice == 2:
                     savedCredentials = False
-                    connect2()
+                    conn = connect()
         else:
             print("Failure: Unknown Error. Sorry")
 
 
-def connect():
+def getApCli():
     global conn
-    global connArgs
-    global savedCredentials
-    expPrompt = False
-    while savedCredentials is False:
-	    connArgs = get_conn_args()
-    conn = nm.BaseConnection(ip=connArgs["ip"], username=connArgs["user"], password=connArgs["pass"], session_log="ssh_session_logfile.txt", session_log_file_mode="write", session_log_record_writes="True")
-    getPrompt = conn.find_prompt()
-    print("-------------------------------------------\n" \
-          "CONNECTED via SSH- \n" \
-          f"Device returned : {getPrompt}               \n" \
-          "-------------------------------------------\n")
-    while expPrompt is False:
-        choice = 0
-        choice = int(input("Is the above CLI prompt the prompt you were\n" \
-                           "expecting from the correct WLC in exec mode? \n" \
-                           "1= Yes | 2=No or Ctrl-C to quit :  "))
-        if choice == 1:
-            return conn
-        elif choice == 2:
-            return get_conn_args()
-
-
-def getApCli(conn):
+    alive = False
     alive = conn.is_alive()
-    if alive == True:
+    while alive is False:
+        print("SSH Connection to WLC has closed. Reconnecting....")
+        conn = connect()
+        alive = conn.is_alive()
+    try:
         no_paging = conn.disable_paging()
-        cli_output = conn.send_command("show ap config general | include ^Cisco AP Name|^MAC Address", use_textfsm=True, textfsm_template="./templates/cisco_ios_show_ap_template-v2.textfsm")
+        cli_output = conn.send_command_timing("show ap config general | include ^Cisco AP Name|^MAC Address", use_textfsm=True, textfsm_template="./templates/cisco_ios_show_ap_template-v2.textfsm")
+    except nm.NetMikoTimeoutException:
+        print("Timeout Error occured. Timeout waiting for device for an operation to continue.")
+        conn = connect()
+    except Exception:
+        print("Auth Error occured. Check Username/Password and try again.")
+        connArgs = get_conn_args()
+        conn = connect()
+    except:
+        print("Unexpected error:", sys.exc_info()[0])
+        raise
     return parseCLI(cli_output)
 
 def send_renameCmds(cli_commands):
@@ -393,6 +379,11 @@ def formatMacs(content):
             else:
                 raise ValueError(
                     print("Unable to normalize MAC Address. Check input and try again"))
+    print("-------------------------------------------\n" \
+          "We located the below entries in the CSV file.\n" \
+          "-------------------------------------------\n")
+    for row in range(len(final_CSVresults)):
+        print(final_CSVresults[row], sep="\n")
     return main2()
 
 
