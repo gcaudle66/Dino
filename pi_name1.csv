@@ -1,10 +1,3 @@
 AP Name,Ethernet MAC,Location,Primary Controller,Secondary Controller,Tertiary Controller
-dllstxatapn01v281a,6c:41:0e:17:03:5c,"			",,,
-DLLCTX04APN02V088A,6C410E173BCC,,,,
-DLLCTX04APN02V088B,6C410E175FBC,,,,
-DLLCTX04APN02V088C,6C410E173BCA,,,,
-DLLCTX04APN02V088D,6C410E175FBB,,,,
-DLLCTX04APN02V088E,f4bd.9e9b.a0fc,,,,
-DLLCTX04APN02V088F,f4bd.9e9b.9eb4,,,,
-Nutter.butter1,683b.782b.38b2,,,,
+Nutter.butter1,683b.782b:38b21,,,,
 Oreo.Cookie2,78bc.1ab3.c8fc,,,,

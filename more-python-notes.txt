@@ -1,3 +1,6 @@
+4/22 - package build notes
+description Script for renaming APs on WLC9800. Desired name/mac combinations are imported via CSV file and matched against WLC current APs then renamed accordingly
+
 4/20-Working local parsing >>> with open('./templates/cisco_ios_show_ap_template-v2.textfsm') as template:
         results_template = textfsm.TextFSM(template)
         content2parse = open("./misc/attSample.txt")

@@ -1,0 +1,12 @@
+Notes-----
+Fix error handling for auth issues
+-Auth error handled
+--timeout error handling done
+
+add convert AP name to lowercase function
+create some base documentation
+fix all error conditions to stop on error rather than dump
+add error verbosity to Regex errors on invalid chars
+
+--Future needs
+-script to default AP back to factory

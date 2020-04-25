@@ -7,6 +7,7 @@ global final_CSVresults
 global final_CLIresults
 global conn
 global connArgs
+global connIsAlive
 global __name__
 global matches
 matches = []
@@ -14,7 +15,8 @@ connArgs = {}
 final_CSVresults = []
 final_CLIresults = []
 savedCredentials = False
-conn = 0
+conn = ConnectHandler
+connIsAlive = False
 
 
 def main():
@@ -64,9 +66,8 @@ def main2():
           "Now we will connect to  a WLC to pull currently\n" \
           " connected and Registered APs.\n" \
           "-------------------------------------------\n")
-    get_conn_args()
     conn = connect()
-    cli_output = getApCli()
+    return getApCli()
     
 
 def main3():
@@ -208,7 +209,7 @@ def get_conn_args():
             savedCredentials = True
             return connArgs
         elif choice == 2:
-                get_conn_args()
+                connArgs = get_conn_args()
         else:
             print("Invalid choice. Please try again or ctrl-c to exit")
             get_connArgs()
@@ -218,67 +219,64 @@ def connect():
     global conn
     global connArgs
     global savedCredentials
+    global connIsAlive
+    attempts = 0
     expPrompt = False
-    while savedCredentials is False:
-	    connArgs = get_conn_args()
-    try:
-        conn = ConnectHandler(ip=connArgs["ip"], username=connArgs["user"], password=connArgs["pass"], device_type="cisco_ios", session_log="ssh_session_logfile.txt", session_log_file_mode="write", session_log_record_writes="True")
-    except nm.NetMikoTimeoutException:
-        print("<--> Timeout Error occured <--> Check IP address and try Again")
-        connArgs = get_conn_args()
-        conn = connect()
-    except nm.NetMikoAuthenticationException:
-        print("<--> Auth Error occured <--> Check Username/Password and try again.")
-        main2()
-    except:
-        print("Unexpected error:", sys.exc_info()[0])
-        raise
-    else:
-        alive = conn.is_alive()
-        if alive is True:
-            print("Connection Successful!")
-            getPrompt = conn.find_prompt()
+    while connIsAlive is False:
+        try:
+            connArgs = get_conn_args()
+            conn = ConnectHandler(ip=connArgs["ip"], username=connArgs["user"], password=connArgs["pass"], device_type="cisco_ios", session_log="ssh_session_logfile.txt", session_log_file_mode="write", session_log_record_writes="True")
+        except nm.NetMikoTimeoutException:
             print("-------------------------------------------\n" \
-                  "CONNECTED via SSH- \n" \
-                  f"Device returned : {getPrompt}               \n" \
+                  "Error: Timeout Error Occured Attempting to \n" \
+                  " Connect. Check IP address and try Again   \n" \
                   "-------------------------------------------\n")
-            while expPrompt is False:
-                choice = 0
-                choice = int(input("Is the above CLI prompt the prompt you were\n" \
-                                   "expecting from the correct WLC in exec mode? \n" \
-                                   "1= Yes | 2=No or Ctrl-C to quit :  "))
-                if choice == 1:
-                    expPrompt = True
-                    return conn
-                elif choice == 2:
-                    savedCredentials = False
-                    conn = connect()
+        except nm.NetMikoAuthenticationException:
+            print("<--> Auth Error occured <--> Check Username/Password and try again.")
+    ##    except:
+    ##        print("Unexpected error:", sys.exc_info()[0])
+    ##        raise
         else:
-            print("Failure: Unknown Error. Sorry")
+            connIsAlive = conn.is_alive()
+            if connIsAlive is True:
+                print("Connection Successful!")
+                getPrompt = conn.find_prompt()
+                print("-------------------------------------------\n" \
+                      "CONNECTED via SSH- \n" \
+                      f"Device returned : {getPrompt}               \n" \
+                      "-------------------------------------------\n")
+                while expPrompt is False:
+                    choice = 0
+                    choice = int(input("Is the above CLI prompt the prompt you were\n" \
+                                       "expecting from the correct WLC in exec mode? \n" \
+                                       "1= Yes | 2=No or Ctrl-C to quit :  "))
+                    if choice == 1:
+                        conn.disable_paging()
+                        expPrompt = True
+                        return conn
+                    elif choice == 2:
+                        savedCredentials = False
+                        conn = connect()
+            else:
+                print("Failure: Unknown Error. Sorry")
 
 
 def getApCli():
     global conn
-    alive = False
-    alive = conn.is_alive()
-    while alive is False:
+    global connIsAlive
+    while connIsAlive is False:
         print("SSH Connection to WLC has closed. Reconnecting....")
         conn = connect()
-        alive = conn.is_alive()
     try:
-        no_paging = conn.disable_paging()
         cli_output = conn.send_command_timing("show ap config general | include ^Cisco AP Name|^MAC Address", use_textfsm=True, textfsm_template="./templates/cisco_ios_show_ap_template-v2.textfsm")
     except nm.NetMikoTimeoutException:
         print("Timeout Error occured. Timeout waiting for device for an operation to continue.")
-        conn = connect()
-    except Exception:
-        print("Auth Error occured. Check Username/Password and try again.")
-        connArgs = get_conn_args()
-        conn = connect()
-    except:
-        print("Unexpected error:", sys.exc_info()[0])
-        raise
-    return parseCLI(cli_output)
+##    except:
+##        print("Unexpected error:", sys.exc_info()[0])
+##        raise
+    else:
+        parseCLI(cli_output)
+        
 
 def send_renameCmds(cli_commands):
     """ Here we send the contents of the cli_commands """
@@ -299,7 +297,6 @@ def send_renameCmds(cli_commands):
             is_connActive = conn.is_alive()
         else:
             print("Error")
-    no_paging = conn.disable_paging()
     conn.send_config_set(config_commands=cli_commands, enter_config_mode=False, cmd_verify=False, exit_config_mode=False)
     conn.disconnect()
     print("-------------------------------------------\n" \
@@ -311,11 +308,12 @@ def send_renameCmds(cli_commands):
         read = log.readlines()
         for line in read:
             print(line)
-    print("-------------------------------------------\n" \
-          "Script Closing and exiting. SSH Closed     \n" \
-          "The logfile is also save locally in the    \n" \
+    close = input("-------------------------------------------\n" \
+          "Script Complete. SSH session closed and    \n" \
+          "The logfile is also saved locally in the   \n" \
           "current dir as ssh_session_logfile.txt     \n" \
-          "-------------------------------------------\n")
+          "---------Press Ctrl-C to Exit--------------\n")
+
     
 
 def parseCSV(csv_choice):
