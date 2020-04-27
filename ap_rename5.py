@@ -339,7 +339,7 @@ def newLower_list(content):
     output = []
     for entry in range(len(content)):
         entry = content.pop()
-        name = entry[0]
+        name = str.lower(entry[0])
         mac = str.lower(entry[1])
         new_entry = [name, mac]
         output.append(new_entry)
