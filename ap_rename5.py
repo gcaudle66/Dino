@@ -317,12 +317,22 @@ def send_renameCmds(cli_commands):
     
 
 def parseCSV(csv_choice):
+    import sys
+    import json
     with open('./templates/cisco_ap_from_csv_template.textfsm') as template:
         results_template = textfsm.TextFSM(template)
         content2parse = open(csv_choice)
         content = content2parse.read()
-        parsedCSV_results = results_template.ParseText(content)
-    return newLower_list(parsedCSV_results)
+        try:
+            parsedCSV_results = results_template.ParseText(content)
+        except textfsm.TextFSMError:
+            err = input("-------------------------------------------\n" \
+                  "ERROR: Import error occured while parsing  \n" \
+                  "MAC Addresses. Invalid characters were found\n" \
+                  "on import(Non-Hex). Check CSV file and try again.\n" \
+                  "-------------------------------------------")
+        else:
+            return newLower_list(parsedCSV_results)
 
 def parseCLI(cli_output):
     global final_CLIresults
@@ -354,7 +364,8 @@ def formatMacs(content):
           "in format xxxx.xxxx.xxxx before proceeding \n" \
           "-------------------------------------------\n")
     import re
-    re_fmt = '[a-fA-F0-9][a-fA-F0-9][a-fA-F0-9][a-fA-F0-9].[a-fA-F0-9][a-fA-F0-9][a-fA-F0-9][a-fA-F0-9].[a-fA-F0-9][a-fA-F0-9][a-fA-F0-9][a-fA-F0-9]'
+    re_fmt = '[a-fA-F0-9][a-fA-F0-9][a-fA-F0-9][a-fA-F0-9]\.[a-fA-F0-9][a-fA-F0-9][a-fA-F0-9][a-fA-F0-9]\.[a-fA-F0-9][a-fA-F0-9][a-fA-F0-9][a-fA-F0-9]'
+#    re_fmt = '^[a-fA-F0-9]{4}\.[a-fA-F0-9]{4}\.[a-fA-F0-9]{4}\b'
     #final_CSVresults = []
     global final_CSVresults
     bad_chars = [":", "."]
@@ -368,15 +379,22 @@ def formatMacs(content):
             for i in bad_chars:
                 mac = mac.replace(i, "")
             print(mac)
-            new_mac = mac[:4] + "." + mac[4:8] + "." + mac[8:12]
-            print(new_mac)
-            if re.match(re_fmt, new_mac):
-                print("Format is now correct...adding to list: " + new_mac)
-                new_entry = [entry[0], new_mac]
-                final_CSVresults.append(new_entry)
-            else:
+            if len(mac) > 12:
                 raise ValueError(
-                    print("Unable to normalize MAC Address. Check input and try again"))
+                    print(input("-------------------------------------------\n" \
+                                "ERROR: Import error occured while parsing  \n" \
+                                "MAC Address " + mac + ". More than 12 characters\n" \
+                                "are present. Check CSV file and try again. \n" \
+                                "-------------------------------------------")))
+            else:
+                new_mac = mac[:4] + "." + mac[4:8] + "." + mac[8:12]
+                print(new_mac)
+                if re.match(re_fmt, new_mac):
+                    print("Format is now correct...adding to list: " + new_mac)
+                    new_entry = [entry[0], new_mac]
+                    final_CSVresults.append(new_entry)
+                else:
+                     print("Unable to normalize MAC Address. Check input and try again")
     print("-------------------------------------------\n" \
           "We located the below entries in the CSV file.\n" \
           "-------------------------------------------\n")
