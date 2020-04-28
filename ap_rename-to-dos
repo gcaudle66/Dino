@@ -4,9 +4,14 @@ Fix error handling for auth issues
 --timeout error handling done
 
 add convert AP name to lowercase function
+--done
+
 create some base documentation
+--done
+
 fix all error conditions to stop on error rather than dump
 add error verbosity to Regex errors on invalid chars
+--done
 
 --Future needs
 -script to default AP back to factory
