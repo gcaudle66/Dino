@@ -322,8 +322,6 @@ def send_renameCmds(cli_commands):
     
 
 def parseCSV(csv_choice):
-    import sys
-    import json
     with open('./templates/cisco_ap_from_csv_template-v2.textfsm') as template:
         results_template = textfsm.TextFSM(template)
         content2parse = open(csv_choice)
