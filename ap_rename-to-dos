@@ -1,10 +1,10 @@
 To-Dos-----
 Fix error handling for auth issues
---Auth error handled. Now repeats process for gathering connection info
+4/27--Auth error handled. Now repeats process for gathering connection info
 --timeout error handling done when connection fails due to incorrect IP
 
 add convert AP name to lowercase function
---done. Script now sets all MAC and AP name characters to lowercase
+4/24--done. Script now sets all MAC and AP name characters to lowercase
 
 create some base documentation
 --done
@@ -12,9 +12,12 @@ create some base documentation
 fix all error conditions to stop on error rather than dump
 --done. All errors now stop for input rather than dump
 add error verbosity to Regex errors on invalid chars
---done. If an incorrect non-hex character is found the script prompts user and shows suspect MAC and awaits input before proceeding. Ignores suspect MAC
+4/27--done. If an incorrect non-hex character is found the script prompts user and shows suspect MAC and awaits input before proceeding. Ignores suspect MAC
 
 
+-Enhancements
+4/29--Hid password entry
+4/29--Added hostname resolution option for WLC IP entry
 
 --Future needs
 -script to default AP back to factory

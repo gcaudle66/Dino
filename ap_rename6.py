@@ -98,6 +98,10 @@ def main3():
     if choice == 1:
         create_commands(matches)
     elif choice == 2:
+        savedCredentials = False
+        print(f"Disconnecting Current SSH Session...") 
+        conn.disconnect()
+        connIsAlive = conn.is_alive()
         main()
     
 
@@ -191,6 +195,7 @@ def importCSV(file_list):
 
 
 def get_conn_args():
+    import getpass
     """ Gather connection related Args and pass to Netmiko """
     global connArgs
     global savedCredentials
@@ -198,9 +203,9 @@ def get_conn_args():
     connArgs = {
     "ip": input("Enter IP address of WLC: "),
     "user": input("Enter username-'must have priv15' :"),
-    "pass": input("Enter password in cleartext: ")}
+    "pass": getpass.win_getpass("Enter password: ")}
     correct = False
-    print(connArgs)
+    print("WLC IP: " + connArgs["ip"] +  " | Username: " + connArgs["user"])
     choice = 0
     choice = int(input("Is the above connection info correct? 1=Yes, 2=No  : "))
     while correct == False:
@@ -233,7 +238,10 @@ def connect():
                   " Connect. Check IP address and try Again   \n" \
                   "-------------------------------------------\n")
         except nm.NetMikoAuthenticationException:
-            print("<--> Auth Error occured <--> Check Username/Password and try again.")
+            print("-------------------------------------------\n" \
+                  "Error: Authentication Error Occured.       \n" \
+                  "Check Credentials and try Again            \n" \
+                  "-------------------------------------------\n")
     ##    except:
     ##        print("Unexpected error:", sys.exc_info()[0])
     ##        raise
