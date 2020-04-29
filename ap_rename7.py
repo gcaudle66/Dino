@@ -20,8 +20,14 @@ connIsAlive = False
 
 
 def main():
-    """ Validate that we have imported CSV and CLI """
-    """ data and do comparison                     """
+    """ Initial start of script and disclaimer. This  """
+    """ In this script we will...\n"                  """
+    """ -Scan for CSV files to import.                """
+    """ -Connect to the chosen WLC and gather         """
+    """ current registered APs -We will then parse    """
+    """ that data and validate the data imported      """
+    """ from CSV and data imported from WLC           """
+    """ matches.-Then change the names on the WLC.    """
     print("-------------------------------------------\n" \
           "<----Welcome to AP Renamerer.---->\n" \
           "-------------------------------------------\n" \
@@ -31,6 +37,8 @@ def main():
           "-We will then parse that data and validate the data imported from\n" \
           " CSV and data imported from WLC matches.\n-Then change the names " \
           " on the WLC.\n"\
+          "-------------------------------------------\n" \
+          "-------------------------------------------\n" \
           "-------------------------------------------\n" \
           "So first lets get the file to import.....\n" \
           "-!! Make sure any CSV files to import\n" \
@@ -60,8 +68,9 @@ def main():
 
 def main2():
     global conn
-    """ Validate that we have imported CSV and CLI """
-    """ data and do comparison                     """
+    """ Validate that we have imported CSV         """
+    """ data and now gather info for connecting to """
+    """ WLC to gather data for comparison with CSV """
     print("-------------------------------------------\n" \
           "Now we will connect to  a WLC to pull currently\n" \
           " connected and Registered APs.\n" \
@@ -72,7 +81,11 @@ def main2():
 
 def main3():
     """ Validate that we have imported CSV and CLI """
-    """ data and do comparison                     """
+    """ data and do comparison between them based """
+    """ on MAC addresses. Create commands for     """
+    """ changing names via SSH/CLi on WLC and adding"""
+    """ them to a list. Then present matches to """
+    """ user and await confirmation b4 sending to WLC """
     print("-------------------------------------------\n" \
           "Now we will compare CSV to CLI for MAC Address\n" \
           " matches and validate it appears correct as expected.\n" \
@@ -174,7 +187,8 @@ def compare(final_CSVresults, final_CLIresults):
     
 
 def importCSV(file_list):
-    """ Choose file to import """
+    """ Choose CSV file to import  that was found in local """
+    """ directory.                                         """
     print("-------------------------------------------\n" \
           "The files found are listed below.          \n" \
           "Please select a number to select the file \n" \
@@ -195,6 +209,9 @@ def importCSV(file_list):
 
 
 def get_conn_args():
+    """ here we will gather connection arguments that """
+    """ will be used when connecting to WLC.          """
+    """ IP/hostname, Username, Password               """
     import getpass
     """ Gather connection related Args and pass to Netmiko """
     global connArgs
@@ -222,6 +239,8 @@ def get_conn_args():
 
 
 def connect():
+    """ Here we will user connArgs gathered from get_conn_args """
+    """ and establish connection to WLC                        """
     global conn
     global connArgs
     global savedCredentials
@@ -274,6 +293,8 @@ def connect():
 
 
 def getApCli():
+    """ Here we will run commands against the WLC to gather """
+    """ necessary data for comparison against CSV           """
     global conn
     global connIsAlive
     while connIsAlive is False:
@@ -330,6 +351,10 @@ def send_renameCmds(cli_commands):
     
 
 def parseCSV(csv_choice):
+    """ Here we will parse through the CSV that was imported """
+    """ using a TextFSM template that looks for only certain """
+    """ fields in the CSV. These fields are defined in the   """
+    """ below mentioned template variable                    """
     with open('./templates/cisco_ap_from_csv_template-v2.textfsm') as template:
         results_template = textfsm.TextFSM(template)
         content2parse = open(csv_choice)
@@ -346,6 +371,10 @@ def parseCSV(csv_choice):
             return newLower_list(parsedCSV_results)
 
 def parseCLI(cli_output):
+    """ Here we will take the CLI gathered data that is  """
+    """ contained in a list, pop off each entry and create """
+    """ a new list so that the format of its list matches """
+    """ the CSV formatted data list.                      """
     global final_CLIresults
     for item in range(len(cli_output)):
         entry = cli_output.pop()
@@ -357,6 +386,7 @@ def parseCLI(cli_output):
 
 def newLower_list(content):
     """ Converts any MAC address fields to lowercase """
+    """ Converts AP names fields to lowercase        """
     output = []
     for entry in range(len(content)):
         entry = content.pop()
@@ -368,6 +398,13 @@ def newLower_list(content):
 
   
 def formatMacs(content):
+    """ here is where it gets fun. This function takes data from """
+    """ the imported CSV list where MAC addresses may not be in """
+    """ the correct format of xxx.xxx.xxxx and removes any existing """
+    """ delimeters, checks to make sure there are no more than 12 hex """
+    """ characters, and if no error is present, rebuilds them into """
+    """ the correct xxxx.xxxx.xxxx format. If any error is raised """
+    """ during the process, that entry is ignored.                """
     print("-------------------------------------------\n" \
           "Normalizing MAC Addresses found in CSV     \n" \
           "All MACs will be set to lowercase and then \n" \
@@ -421,4 +458,5 @@ def formatMacs(content):
 
 
 if __name__ == "__main__":
+    """ Let the insanity begin """
     main()
