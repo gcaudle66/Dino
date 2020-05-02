@@ -19,7 +19,7 @@ conn = ConnectHandler
 connIsAlive = False
 
 # Version and Author Info
-__version__ = "1.8"
+__version__ = "2.0"
 __author__ = "Garrett Caudle | gcaudle66@gmail.com"
 
 class Ap_Rename:
