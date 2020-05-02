@@ -1,7 +1,0 @@
-Value AP_NAME (.+?)
-Value MAC_ADDRESS (.+?)
-
-Start
-  ^Cisco\s+AP\s+Name\.*\s+${AP_NAME}\s*$$
-  ^Cisco\s+AP\s+Identifier\.*\s+${MAC_ADDRESS}\s*$$ -> Record 
-  ^. -> Error

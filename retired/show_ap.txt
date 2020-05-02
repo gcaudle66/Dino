@@ -1,6 +1,0 @@
-Number of APs: 2
-
-AP Name                            Slots    AP Model  Ethernet MAC    Radio MAC       Location                          Country     IP Address                                 State         
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-AP7069.5AEB.E424                     2      3802I     7069.5aeb.e424  28ac.9ed8.d020  default location                  US          172.16.100.104                             Registered    
-Floor2.AP.C9C0                       2      3802I     78bc.1adb.c9c0  683b.7850.d8e0  Global/United States/Texas/Richa  US          172.16.200.100                             Registered    

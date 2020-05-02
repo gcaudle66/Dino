@@ -1,7 +1,0 @@
-Value AP_NAME (.+?)
-Value MAC_ADDRESS ([a-fA-F0-9:\.]{12,17})
-
-Start
-  ^AP\sName(,|\s)Ethernet\sMAC(,|\s) -> Record
-  ^${AP_NAME}(,|\s)${MAC_ADDRESS}(,|\s) -> Record
-  ^. -> Error

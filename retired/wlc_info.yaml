@@ -1,7 +1,0 @@
----
-wlcConn:
-  - ip: 198.18.134.100
-  - url: https://198.18.134.100
-  - cliCreds:
-    username: admin
-    password: C1sco12345
