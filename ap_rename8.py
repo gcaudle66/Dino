@@ -18,6 +18,21 @@ savedCredentials = False
 conn = ConnectHandler
 connIsAlive = False
 
+# Version and Author Info
+__version__ = "1.8"
+__author__ = "Garrett Caudle | gcaudle66@gmail.com"
+
+class Ap_Rename:
+    """ This is the AP Rename app (aka AP Renamerer)
+    This app is used to bulk rename Access points
+    In Cisco 9800 IOS-XE platform wireless LAN
+    Controllers. This app is not maintained nor
+    Endorsed in any way by Cisco Systems Inc.
+    Use of this App is at the users own risk
+    """
+    def __init__(self, version, author):
+        self.version = __version__
+        self.author = __author__
 
 def main():
     """ Initial start of script and disclaimer.       \n""" \
