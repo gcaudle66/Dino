@@ -1,6 +1,6 @@
 To-Dos-----
 Fix error handling for auth issues
-4/27--Auth error handled. Now repeats process for gathering connection info
+1.7 4/27--Auth error handled. Now repeats process for gathering connection info
 --timeout error handling done when connection fails due to incorrect IP
 
 add convert AP name to lowercase function
@@ -12,12 +12,12 @@ create some base documentation
 fix all error conditions to stop on error rather than dump
 --done. All errors now stop for input rather than dump
 add error verbosity to Regex errors on invalid chars
-4/27--done. If an incorrect non-hex character is found the script prompts user and shows suspect MAC and awaits input before proceeding. Ignores suspect MAC
-
+1.7 4/27--done. If an incorrect non-hex character is found the script prompts user and shows suspect MAC and awaits input before proceeding. Ignores suspect MAC
+1.7 4/29- If wrror occurs during CSV or CLI parsing of data unrecoverable error occurs rather than app dump. This way user is aware as to why this occured.
 
 -Enhancements
-4/29--Hid password entry
-4/29--Added hostname resolution option for WLC IP entry
+1.7 4/29--Hid password entry. Now when typing password into windows it is hidden
+1.7 4/29--Added hostname resolution option for WLC IP entry
 
 --Future needs
 -script to default AP back to factory
