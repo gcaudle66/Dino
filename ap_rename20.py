@@ -81,11 +81,20 @@ def main():
         exit()
 
 
+def main1():
+    """ Here we will call to the dnac_api module in order
+        to get the needed WLC/AP data to begin locating
+        the WLC/s to connect to for renaming APs
+    """
+    import dnac_api
+    wifi_inv = dnac_api.api_main()
+    print(wifi_inv)
+
 def main2():
-    global conn
     """ Validate that we have imported CSV         \n""" \
     """ data and now gather info for connecting to \n""" \
     """ WLC to gather data for comparison with CSV \n"""
+    global conn
     print("-------------------------------------------\n" \
           "Now we will connect to  a WLC to pull currently\n" \
           " connected and Registered APs.\n" \

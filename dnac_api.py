@@ -4,18 +4,18 @@ import base64
 import logging
 requests.packages.urllib3.disable_warnings()
 global debug_status
-global dnac_token
+#global dnac_token
 global dnac_token_lifetime
 global dnac_token_expired
 global dnac_connArgs
 global dnac_savedCreds
-global dnac_inventory
-global wifi_inv
+#global dnac_inventory
+#global wifi_inv
 global recent_urls
 global json_data
 
 dnac_token_expired = True
-dnac_savedCreds = True
+dnac_savedCreds = False
 debug_status = False
 
 
@@ -25,10 +25,10 @@ json_data = []
 ## Common DNAC API URLs to call in functioons
 inv_url = "/dna/intent/api/v1/network-device"
 
-dnac_connArgs = {"cluster": "198.18.129.100",
-                 "username": "admin",
-                 "password": "C1sco12345"}
-##dnac_connArgs = {}
+##dnac_connArgs = {"cluster": "198.18.129.100",
+##                 "username": "admin",
+##                 "password": "C1sco12345"}
+dnac_connArgs = {}
 ## Recent URLs List for storing recent and common API Calls. List of lists with nested DICTs. [[description,{method,url}]
 ##recent_urls = [["Inventory", {"method": "GET", "url": "/dna/intent/api/v1/network-device"}]
 ##               ["Token", {"method": "POST", "url": "/dna/system/api/v1/auth/token"}]]
@@ -165,6 +165,7 @@ def main_menu():
                   f"* Total WLCs: {len(wifi_inv[0])}                       *\n" \
                   f"* Total APs: {len(wifi_inv[1])}                        *\n" \
                   "*********************************************************\n")
+            return wifi_inv
     elif choice == 2:
         main_menu()
 
