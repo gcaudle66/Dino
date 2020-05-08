@@ -2,20 +2,20 @@ import requests
 from requests.auth import HTTPBasicAuth
 import base64
 import logging
+import dino
 requests.packages.urllib3.disable_warnings()
 global debug_status
-#global dnac_token
+global dnac_token
 global dnac_token_lifetime
 global dnac_token_expired
-global dnac_connArgs
-global dnac_savedCreds
-#global dnac_inventory
+##global dnac_savedCreds
+global dnac_inventory
 #global wifi_inv
 global recent_urls
 global json_data
 
 dnac_token_expired = True
-dnac_savedCreds = False
+dnac_savedCreds = True
 debug_status = False
 
 
@@ -23,173 +23,173 @@ debug_status = False
 json_data = []
 
 ## Common DNAC API URLs to call in functioons
-inv_url = "/dna/intent/api/v1/network-device"
+
 
 ##dnac_connArgs = {"cluster": "198.18.129.100",
 ##                 "username": "admin",
 ##                 "password": "C1sco12345"}
-dnac_connArgs = {}
+##dnac_connArgs = {}
 ## Recent URLs List for storing recent and common API Calls. List of lists with nested DICTs. [[description,{method,url}]
 ##recent_urls = [["Inventory", {"method": "GET", "url": "/dna/intent/api/v1/network-device"}]
 ##               ["Token", {"method": "POST", "url": "/dna/system/api/v1/auth/token"}]]
 
-def api_main():
-    """ Where the magic begins
-    Here we begin the process of gathering wireless LAN
-    controllers from DNA center in order to locate the
-    APs that need to be renamed as requested by the "ap_rename"
-    module. This program will...
-        --Gather needed info for connection to DNAC (IP, user/pass)
-        --Use requests module to make an API POST call to aquire
-          AUTH-Token needed to proceed with subsequent calls.
-        --If suxcessful acquiring token, program will make API
-          call to DNAC and gather entire inventory of "Managed"
-          devices, create a local list to hold that inventory and add
-          it to it
-        --Program will then iterate through this inventory list looking
-          for devices with the "Family" value of Wireless Controller
-        --If match is found, matches are added to a llocal DICT containing
-          the WLC "hostname" and "mgmntIPAddress"
-    """
-    global dnac_savedCreds
-    global dnac_connArgs
-    while dnac_savedCreds == False:
-        print("*********************************************************");
-        print("* Cisco DNA Center REST API Python Utility              *");
-        print("*                                                       *");
-        print("* Please provide the following data in order to connect *");
-        print("*                                                       *");
-        print("* DNAC API IP: Cluster IP address for target DNA Center *");
-        print("* Username: [username]                                  *");
-        print("* Password: [password]                                  *");
-        print("*                                                       *");
-        print("*                                                       *");
-        print("* Control C to exit                                     *");
-        print("*********************************************************");
-        dnac_connArgs = {
-            "cluster": input("DNAC API IP: "),
-            "username": input("Username:"),
-            "password": input("Password: ")}
-        correct = False
-        print("DNAC API IP: " + dnac_connArgs["cluster"] + " | Username: " + dnac_connArgs["username"])
-        choice = 0
-        choice = int(input("Is the above connection info correct? 1=Yes, 2=No  : "))
-        while correct == False:
-            if choice == 1:
-                correct = True
-                dnac_savedCreds = True
-                dnac_connArgs
-            elif choice == 2:
-                main()
-                break
-    choice2 = 0
-    print("*********************************************************");
-    print("* Cisco DNA Center REST API Python Utility              *");
-    print("*                                                       *");
-    print("* User has confirmed connection info. Next step...      *");
-    print("*                                                       *");
-    print("* Script will now connect to the DNA Center API         *");
-    print("* interface and retreive the Authentication Token       *");
-    print("*                                                       *");
-    print("* Control C to exit                                     *");
-    print("*********************************************************");
-    choice2 = int(input("* Are you ready to proceed with this step? 1=Yes, 2=No  : "))
-    if choice2 == 1:
-        dnac_token = get_dnac_token(dnac_connArgs)
-        return dnac_token, main2()
-    elif choice2 == 2:
-        main()
-
-    
-def main2():
-    """ 
-    """
-    global dnac_token
-    global dnac_inventory
-    choice = 0
-    global inv_url
-    print("*********************************************************");
-    print("* Cisco DNA Center REST API Python Utility              *");
-    print("*                                                       *");
-    print("* Script retreived Auth Token from API. Next step...    *");
-    print("*                                                       *");
-    print("* Script will now GET full inventory of devices in      *");
-    print("* DNA Center.                                                      *");
-    print("*                                                       *");
-    print("* Control C to exit                                     *");
-    print("*********************************************************");
-    choice = int(input("* Are you ready to proceed with this step? 1=Yes, 2=No  : "))
-    if choice == 1:
-        try:
-            dnac_inventory = get_dnac_inventory()
-        except Exception:
-            print("Something went wonky and an exception got thrown")
-            main2()
-        else:
-            return dnac_inventory, main_menu()
-    elif choice == 2:
-        main()
-
-def main_menu():
-    """
-    """
-    global wifi_inv
-    choice = 0
-    print("*********************************************************");
-    print("* Cisco DNA Center REST API Python Utility              *");
-    print("*                                                       *");
-    print("* Success! Inventory was Collected from DNAC API.       *");
-    print("*                                                       *");
-    print("*********************************************************");
-    print("* Now choose what you wanna do with the data!           *");
-    print("* Intent Menu --------                                  *");
-    print("*                                                       *");
-    print("* [1] Wifi Inventory                                    *");
-    print("* [2] Resync All Devices                                *");
-    print("*                                                       *");
-    print("*                                                       *");                            
-    print("*                                                       *");
-    print("* Control C to exit                                     *");
-    print("*********************************************************");
-    choice = int(input("* Intent Menu Choice [#] :  "))
-    if choice == 1:
-        wifi_inv = []
-        try:
-            wifi_inventory(wifi_inv, dnac_inventory)
-        except Exception:
-            print("Something went wonky and an exception got thrown")
-            main_menu()
-        else:
-            print("*********************************************************\n" \
-                  "* WiFi Inventory Collection was a Success!              *\n" \
-                  f"* Total WLCs: {len(wifi_inv[0])}                       *\n" \
-                  f"* Total APs: {len(wifi_inv[1])}                        *\n" \
-                  "*********************************************************\n")
-            return wifi_inv
-    elif choice == 2:
-        main_menu()
-
+##def api_main():
+##    """ Where the magic begins
+##    Here we begin the process of gathering wireless LAN
+##    controllers from DNA center in order to locate the
+##    APs that need to be renamed as requested by the "ap_rename"
+##    module. This program will...
+##        --Gather needed info for connection to DNAC (IP, user/pass)
+##        --Use requests module to make an API POST call to aquire
+##          AUTH-Token needed to proceed with subsequent calls.
+##        --If suxcessful acquiring token, program will make API
+##          call to DNAC and gather entire inventory of "Managed"
+##          devices, create a local list to hold that inventory and add
+##          it to it
+##        --Program will then iterate through this inventory list looking
+##          for devices with the "Family" value of Wireless Controller
+##        --If match is found, matches are added to a llocal DICT containing
+##          the WLC "hostname" and "mgmntIPAddress"
+##    """
+##    global dnac_savedCreds
+##    global dnac_connArgs
+##    while dnac_savedCreds == False:
+##        print("*********************************************************");
+##        print("* Cisco DNA Center REST API Python Utility              *");
+##        print("*                                                       *");
+##        print("* Please provide the following data in order to connect *");
+##        print("*                                                       *");
+##        print("* DNAC API IP: Cluster IP address for target DNA Center *");
+##        print("* Username: [username]                                  *");
+##        print("* Password: [password]                                  *");
+##        print("*                                                       *");
+##        print("*                                                       *");
+##        print("* Control C to exit                                     *");
+##        print("*********************************************************");
+##        dnac_connArgs = {
+##            "cluster": input("DNAC API IP: "),
+##            "username": input("Username:"),
+##            "password": input("Password: ")}
+##        correct = False
+##        print("DNAC API IP: " + dnac_connArgs["cluster"] + " | Username: " + dnac_connArgs["username"])
+##        choice = 0
+##        choice = int(input("Is the above connection info correct? 1=Yes, 2=No  : "))
+##        while correct == False:
+##            if choice == 1:
+##                correct = True
+##                dnac_savedCreds = True
+##                dnac_connArgs
+##            elif choice == 2:
+##                main()
+##                break
+##    choice2 = 0
+##    print("*********************************************************");
+##    print("* Cisco DNA Center REST API Python Utility              *");
+##    print("*                                                       *");
+##    print("* User has confirmed connection info. Next step...      *");
+##    print("*                                                       *");
+##    print("* Script will now connect to the DNA Center API         *");
+##    print("* interface and retreive the Authentication Token       *");
+##    print("*                                                       *");
+##    print("* Control C to exit                                     *");
+##    print("*********************************************************");
+##    choice2 = int(input("* Are you ready to proceed with this step? 1=Yes, 2=No  : "))
+##    if choice2 == 1:
+##        dnac_token = get_dnac_token(dnac_connArgs)
+##        return dnac_token, main2()
+##    elif choice2 == 2:
+##        main()
+##
+##    
+##def main2():
+##    """ 
+##    """
+##    global dnac_token
+##    global dnac_inventory
+##    choice = 0
+##    global inv_url
+##    print("*********************************************************");
+##    print("* Cisco DNA Center REST API Python Utility              *");
+##    print("*                                                       *");
+##    print("* Script retreived Auth Token from API. Next step...    *");
+##    print("*                                                       *");
+##    print("* Script will now GET full inventory of devices in      *");
+##    print("* DNA Center.                                                      *");
+##    print("*                                                       *");
+##    print("* Control C to exit                                     *");
+##    print("*********************************************************");
+##    choice = int(input("* Are you ready to proceed with this step? 1=Yes, 2=No  : "))
+##    if choice == 1:
+##        try:
+##            dnac_inventory = get_dnac_inventory()
+##        except Exception:
+##            print("Something went wonky and an exception got thrown")
+##            main2()
+##        else:
+##            return dnac_inventory, main_menu()
+##    elif choice == 2:
+##        main()
+##
+##def main_menu():
+##    """
+##    """
+##    global wifi_inv
+##    choice = 0
+##    print("*********************************************************");
+##    print("* Cisco DNA Center REST API Python Utility              *");
+##    print("*                                                       *");
+##    print("* Success! Inventory was Collected from DNAC API.       *");
+##    print("*                                                       *");
+##    print("*********************************************************");
+##    print("* Now choose what you wanna do with the data!           *");
+##    print("* Intent Menu --------                                  *");
+##    print("*                                                       *");
+##    print("* [1] Wifi Inventory                                    *");
+##    print("* [2] Resync All Devices                                *");
+##    print("*                                                       *");
+##    print("*                                                       *");                            
+##    print("*                                                       *");
+##    print("* Control C to exit                                     *");
+##    print("*********************************************************");
+##    choice = int(input("* Intent Menu Choice [#] :  "))
+##    if choice == 1:
+##        wifi_inv = []
+##        try:
+##            wifi_inventory(wifi_inv, dnac_inventory)
+##        except Exception:
+##            print("Something went wonky and an exception got thrown")
+##            main_menu()
+##        else:
+##            print("*********************************************************\n" \
+##                  "* WiFi Inventory Collection was a Success!              *\n" \
+##                  f"* Total WLCs: {len(wifi_inv[0])}                       *\n" \
+##                  f"* Total APs: {len(wifi_inv[1])}                        *\n" \
+##                  "*********************************************************\n")
+##            return wifi_inv
+##    elif choice == 2:
+##        main_menu()
+##
         
-def get_dnac_token(dnac_connArgs):
+def get_dnac_token():
     global dnac_token
     try:
         token = requests.post(
-        "https://" + dnac_connArgs["cluster"] + "/dna/system/api/v1/auth/token",
+        "https://" + dino.dnac_connArgs["cluster"] + "/dna/system/api/v1/auth/token",
         auth=HTTPBasicAuth(
-           username = dnac_connArgs["username"],
-           password = dnac_connArgs["password"]
+           username = dino.dnac_connArgs["username"],
+           password = dino.dnac_connArgs["password"]
         ),
         headers={'content-type': 'application/json'},
         verify=False,
         )
     except requests.exceptions.ConnectionError:
         print("Some error occured, likely a timeout")
-        main2()
+        ap_rename20.main2()
     else:
         data = token.json()
         dnac_token = data["Token"]
         print("AUTH Token retrieved!")
-        print(dnac_token)
+##        print(dnac_token)
         return dnac_token
 
 def get_device_WifiInfo(dnac_token, ap_uuid):
@@ -210,8 +210,8 @@ def get_device_WifiInfo(dnac_token, ap_uuid):
 def get_dnac_inventory():
     import json
     global dnac_token
-    global inv_url
-    url = "https://" + dnac_connArgs["cluster"] + inv_url
+    inv_url = "/dna/intent/api/v1/network-device"
+    url = "https://" + dino.dnac_connArgs["cluster"] + inv_url
     payload = {}
     files = {}
     headers = {
@@ -230,14 +230,14 @@ def get_dnac_inventory():
         return dnac_inventory
 
 
-def wifi_inventory(wifi_inv, dnac_inventory):
-    wlcs = locate_wlcs(dnac_inventory)
-    aps = locate_aps(dnac_inventory)
+def wifi_inventory(wifi_inv, dnac_connArgs):
+    wlcs = locate_wlcs(dnac_token, dnac_inventory)
+    aps = locate_aps(dnac_token, dnac_inventory)
     wifi_inv.append(wlcs)
     wifi_inv.append(aps)
     return wifi_inv
 
-def locate_aps(dnac_inventory):
+def locate_aps(dnac_token, dnac_inventory):
     ap_count = 0
     ap_inv = {}
     temp_inv = dnac_inventory.copy()
@@ -251,7 +251,7 @@ def locate_aps(dnac_inventory):
             ap["associatedWlcIp"] = entry["associatedWlcIp"]
             ap["instanceUuid"] = entry["instanceUuid"]
             ap_uuid = entry["instanceUuid"]
-            ap["ethMacAddress"] = get_ap_ethMac(ap_uuid)
+            ap["ethMacAddress"] = get_ap_ethMac(dnac_token, ap_uuid)
             ap["location"] = entry["location"]
             ap_inv[ap.get("hostname")] = ap
             ap_count = ap_count + 1
@@ -261,11 +261,11 @@ def locate_aps(dnac_inventory):
           "Registered in DNA Center                     \n")
     return ap_inv
 
-def get_ap_ethMac(ap_uuid):
+def get_ap_ethMac(dnac_token, ap_uuid):
     import json
-    global dnac_token
+##    global dnac_token
     ap_WifiInfo_url = "/dna/intent/api/v1/network-device/" + ap_uuid + "/wireless-info"
-    url = "https://" + dnac_connArgs["cluster"] + ap_WifiInfo_url
+    url = "https://" + dino.dnac_connArgs["cluster"] + ap_WifiInfo_url
     payload = {}
     files = {}
     headers = {
@@ -277,7 +277,7 @@ def get_ap_ethMac(ap_uuid):
     device_WifiInfo = json_data["response"]
     return device_WifiInfo.get("ethMacAddress")
 
-def locate_wlcs(dnac_inventory):
+def locate_wlcs(dnac_token, dnac_inventory):
     wlc_count = 0
     temp_inv = dnac_inventory.copy()
     wlc_inv = {}
@@ -326,7 +326,7 @@ def enable_req_debug():
     
 
 
-if __name__ == "__main__":
-    api_main()
+##if __name__ == "__main__":
+##    api_main()
 #dnac_token = get_dnac_token(dnac_connArgs)
 #dnac_inventory = get_dnac_inventory(dnac_token)
