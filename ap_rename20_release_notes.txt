@@ -1,0 +1,13 @@
+ap_rename 2.0 release notes
+
+--Major change/enhancement
+	Adding capability for user to choose whether to connect to 
+		-a specific WLC that has target APs to be renamed registered to it. Or...
+		-NEW FEATURE- Cisco DNA Center via API calls to gather list of ALL WLCs that are currenty managed to it.  
+			-USE CASES- 
+				-APs Specific Hosting WLC is Unknown: User needs to rename any number of APs but is unsure of which WLC 1 or more of the APs are currently registered to.
+				-APs that are to be renamed are not registered to same WLCs.
+				-
+				-Utilize DNAC as a central respository for WLCs in users env.
+		When the user is unsure of the target AP's hosting controller
+	will now also be able to connect to DNA Center via RESTFUL API in order to locate
