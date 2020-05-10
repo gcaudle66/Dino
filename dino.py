@@ -3,8 +3,7 @@ import os
 import ap_rename20
 global dnac_savedCreds
 global dnac_connArgs
-
-
+global wifi_inv
 
 
 dnac_savedCreds = True
@@ -38,16 +37,16 @@ def dino_main():
     """
     choice = 0
     print("*********************************************************");
-    print("* Welcome to DINO                                       *");
     print("*                                                       *");
+    print("* Dino | Network Utility Application                    *");
     print("*                                                       *");
     print("*                                                       *");
     print("*********************************************************");
-    print("* Please choose the intent from the options below       *");
+    print("* Please indicate intent using the options below        *");
     print("* Intent Menu --------                                  *");
     print("*                                                       *");
-    print("* [1] Bulk AP Rename via DNAC                           *");
-    print("* [2]                                                   *");
+    print("* [1] AP Rename Utility (DNAC API + SSH to Multi-WLC)   *");
+    print("* [2] AP Rename Utility (SSH to Single WLC)             *");
     print("*                                                       *");
     print("*                                                       *");                            
     print("*                                                       *");
@@ -63,9 +62,10 @@ def dino1_main():
     """
     """
     print("*********************************************************");
-    print("* AP Rename | Import CSV                                *");
+    print("* Dino | AP Rename Utility                              *");
     print("*                                                       *");
-    print("* Dino will scan current DIR for any CSV file to import *");
+    print("* Import CSV - Ensure CSV file to import is placed in   *");
+    print("*              current DIR and proceed.                 *");
     print("*                                                       *");
     print("*********************************************************");
     cont = False
@@ -73,9 +73,9 @@ def dino1_main():
     choice = int(input("Are you ready to proceed? 1=Yes 2=No or Ctrl-C to quit: "))
     if choice == 1:
         cont = True
-        print("-------------------------------------------\n" \
-          "Scanning current directory for CSV files...\n" \
-          "-------------------------------------------\n")
+        print("*********************************************************");
+        print("* Scanning current directory for CSV files...           *");
+        print("*********************************************************");
         cwd = os.getcwd()
         with os.scandir(path=cwd) as it:
             file_list = []
@@ -156,7 +156,7 @@ def api_main():
     global dnac_connArgs
     while dnac_savedCreds == False:
         print("*********************************************************");
-        print("* Cisco DNA Center REST API Python Utility              *");
+        print("* Dino | Cisco DNA Center REST API Connex               *");
         print("*                                                       *");
         print("* Please provide the following data in order to connect *");
         print("*                                                       *");
@@ -185,9 +185,9 @@ def api_main():
                 break
     choice2 = 0
     print("*********************************************************");
-    print("* Cisco DNA Center REST API Python Utility              *");
+    print("* Dino | Cisco DNA Center REST API Connex               *");
     print("*                                                       *");
-    print("* User has confirmed connection info. Next step...      *");
+    print("* -Success! Connection info confirmed.                  *");
     print("*                                                       *");
     print("* Script will now connect to the DNA Center API         *");
     print("* interface and retreive the Authentication Token       *");
@@ -207,12 +207,12 @@ def api_main2():
     """
     choice = 0
     print("*********************************************************");
-    print("* Cisco DNA Center REST API Python Utility              *");
+    print("* Dino | Cisco DNA Center REST API Connex               *");
     print("*                                                       *");
-    print("* Script retreived Auth Token from API. Next step...    *");
+    print("* -Success! Script retreived Auth Token from DNAC.      *");
     print("*                                                       *");
     print("* Script will now GET full inventory of devices in      *");
-    print("* DNA Center.                                                      *");
+    print("* DNA Center.                                           *");
     print("*                                                       *");
     print("* Control C to exit                                     *");
     print("*********************************************************");
@@ -234,16 +234,16 @@ def api_main_menu():
     """
     choice = 0
     print("*********************************************************");
-    print("* Cisco DNA Center REST API Python Utility              *");
+    print("* Dino | Cisco DNA Center REST API Connex               *");
     print("*                                                       *");
-    print("* Success! Inventory was Collected from DNAC API.       *");
+    print("* -Success! Inventory collected from DNAC.              *");
     print("*                                                       *");
     print("*********************************************************");
-    print("* Now choose what you wanna do with the data!           *");
+    print("* Choose next step to continue.          *");
     print("* Intent Menu --------                                  *");
     print("*                                                       *");
-    print("* [1] Gather Wifi Inventory for AP Rename               *");
-    print("* [2] Resync All Devices                                *");
+    print("* [1] AP Rename - Process DNAC inventory for comparison *");
+    print("* [2] DNAC API - Force Inventory Resync All Devices     *");
     print("*                                                       *");
     print("*                                                       *");                            
     print("*                                                       *");
@@ -253,32 +253,46 @@ def api_main_menu():
     if choice == 1:
         wifi_inv = []
         try:
-            dnac_api.wifi_inventory(wifi_inv, dnac_connArgs)
+            wifi_inv = dnac_api.wifi_inventory(wifi_inv, dnac_connArgs)
         except Exception:
             print("Something went wonky and an exception got thrown")
             api_main_menu()
         else:
             print("*********************************************************\n" \
                   "* WiFi Inventory Collection was a Success!              *\n" \
-                  f"* Total WLCs: {len(wifi_inv[0])}                       *\n" \
-                  f"* Total APs: {len(wifi_inv[1])}                        *\n" \
+                  f"* Total WLCs: {len(wifi_inv[0])}                                    *\n" \
+                  f"* Total APs: {len(wifi_inv[1])}                                     *\n" \
                   "*********************************************************\n")
-            return wifi_inv
+            if len(wifi_inv[1]) == 0:
+                    print("*********************************************************");
+                    print("* Dino | Cisco DNA Center REST API Connex               *");
+                    print("*********************************************************");
+                    print("*                                                       *");
+                    print("* Houston, we have a problem!                           *");
+                    print("* No APs we were found when DNAC was polled.            *");
+                    print("*                                                       *");
+                    print("* Press Enter key to restart program.                   *");
+                    print("*                                                       *");
+                    print("* Control C to exit                                     *");
+                    print("*********************************************************");
+                    err = input("*********************************************************")
+                    dino_main()
+            return ap_rename20.parseAPI(wifi_inv)
     elif choice == 2:
-        main_menu()
+        dino_main()
+    return wifi_inv
 
-
-def main2():
-    """ Validate that we have imported CSV         \n""" \
-    """ data and now gather info for connecting to \n""" \
-    """ WLC to gather data for comparison with CSV \n"""
-    global conn
-    print("-------------------------------------------\n" \
-          "Now we will connect to  a WLC to pull currently\n" \
-          " connected and Registered APs.\n" \
-          "-------------------------------------------\n")
-    conn = ap_rename20.connect()
-    return ap_rename20.getApCli()
+##def main2():
+##    """ Validate that we have imported CSV         \n""" \
+##    """ data and now gather info for connecting to \n""" \
+##    """ WLC to gather data for comparison with CSV \n"""
+##    global conn
+##    print("-------------------------------------------\n" \
+##          "Now we will connect to  a WLC to pull currently\n" \
+##          " connected and Registered APs.\n" \
+##          "-------------------------------------------\n")
+##    conn = ap_rename20.connect()
+##    return ap_rename20.getApCli()
     
 
 def main3():

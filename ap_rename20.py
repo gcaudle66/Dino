@@ -6,6 +6,7 @@ import os
 import dnac_api
 global final_CSVresults
 global final_CLIresults
+global final_APIresults
 global conn
 global connArgs
 global connIsAlive
@@ -14,6 +15,7 @@ matches = []
 connArgs = {}
 final_CSVresults = []
 final_CLIresults = []
+final_APIresults = []
 savedCredentials = False
 conn = ConnectHandler
 connIsAlive = False
@@ -404,15 +406,15 @@ def connect():
             connArgs = get_conn_args()
             conn = ConnectHandler(ip=connArgs["ip"], username=connArgs["user"], password=connArgs["pass"], device_type="cisco_ios", session_log="ssh_session_logfile.txt", session_log_file_mode="write", session_log_record_writes="True")
         except nm.NetMikoTimeoutException:
-            print("-------------------------------------------\n" \
-                  "Error: Timeout Error Occured Attempting to \n" \
-                  "connect. Check IP/Hostname and try Again   \n" \
-                  "-------------------------------------------\n")
+            print("*********************************************************\n" \
+                  "* Error: Timeout Error Occured Attempting to            *\n" \
+                  "* connect. Check IP/Hostname and try Again              *\n" \
+                  "*********************************************************\n")
         except nm.NetMikoAuthenticationException:
-            print("-------------------------------------------\n" \
-                  "Error: Authentication Error Occured.       \n" \
-                  "Check Credentials and try Again            \n" \
-                  "-------------------------------------------\n")
+            print("*********************************************************\n" \
+                  "* Error: Authentication Error Occured.                  *\n" \
+                  "* Check Credentials and try Again                       *\n" \
+                  "*********************************************************\n")
     ##    except:
     ##        print("Unexpected error:", sys.exc_info()[0])
     ##        raise
@@ -537,6 +539,25 @@ def parseCLI(cli_output):
         final_CLIresults.append(add)
     return dino.main3()
 
+
+def parseAPI(wifi_inv):
+    """ Parses through API wifi inventory list seperating
+        index[1] which holds the APs, iterating it and
+        adding hostname and ethMACAddress to a new list
+        to match format of the CSV list for matching
+    """
+    parsedAPI = []
+    index = 0
+    temp_inv = wifi_inv
+    for item in range(len(temp_inv[1])):
+        item = temp_inv[1][index]
+        name = item.get("hostname")
+        mac = item.get("ethMacAddress")
+        entry = [name, mac]
+        index = index + 1
+        parsedAPI.append(entry)
+    return api_formatMacs(parsedAPI)
+
 def newLower_list(content):
     """ Converts any MAC address fields to lowercase \n""" \
     """ Converts AP names fields to lowercase        \n"""
@@ -609,6 +630,49 @@ def formatMacs(content):
         print(final_CSVresults[row], sep="\n")
     return dino.api_main()
 
+
+def api_formatMacs(content):
+    import re
+    global final_APIresults
+    re_fmt = '[a-fA-F0-9][a-fA-F0-9][a-fA-F0-9][a-fA-F0-9]\.[a-fA-F0-9][a-fA-F0-9][a-fA-F0-9][a-fA-F0-9]\.[a-fA-F0-9][a-fA-F0-9][a-fA-F0-9][a-fA-F0-9]'
+    final_APIresults = []
+    bad_chars = [":", "."]
+    for entry in range(len(content)):
+        entry = content.pop()
+        if re.match(re_fmt, entry[1]):
+            final_APIresults.append(entry)
+        else:
+            mac = entry[1]
+            print("Incorrect format: " + mac)
+            for i in bad_chars:
+                mac = mac.replace(i, "")
+            print(f"Removing seperators: {mac}")
+            if len(mac) > 12:
+                raise ValueError(
+                    print(input("-------------------------------------------\n" \
+                                "ERROR: Format error occured while parsing  \n" \
+                                "MAC Address " + mac + "                    \n" \
+                                "-------------------------------------------")))
+            else:
+                new_mac = mac[:4] + "." + mac[4:8] + "." + mac[8:12]
+                print(f"Reformatted: {new_mac}")
+                if re.match(re_fmt, new_mac):
+                    print("Format is now correct...adding to list: " + new_mac)
+                    new_entry = [entry[0], new_mac]
+                    final_APIresults.append(new_entry)
+                else:
+                     err = input("-------------------------------------------\n" \
+                           "ERROR: Unable to normalize MAC Address:    \n" \
+                           f" {new_mac}                                \n" \
+                           "Possible Non-Hex Character. Ignoring this entry\n"
+                           "Press Enter key to continue                \n" \
+                           "-------------------------------------------\n")
+    print("-------------------------------------------\n" \
+          " Format Complete for the below API Entries \n" \
+          "-------------------------------------------\n")
+    for row in range(len(final_APIresults)):
+        print(final_APIresults[row], sep="\n")
+    return final_APIresults
 
 
 if __name__ == "__main__":

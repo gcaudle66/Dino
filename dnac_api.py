@@ -233,13 +233,13 @@ def get_dnac_inventory():
 def wifi_inventory(wifi_inv, dnac_connArgs):
     wlcs = locate_wlcs(dnac_token, dnac_inventory)
     aps = locate_aps(dnac_token, dnac_inventory)
-    wifi_inv.append(wlcs)
-    wifi_inv.append(aps)
+    wifi_inv.insert(0, wlcs)
+    wifi_inv.insert(1, aps)
     return wifi_inv
 
 def locate_aps(dnac_token, dnac_inventory):
     ap_count = 0
-    ap_inv = {}
+    ap_inv = []
     temp_inv = dnac_inventory.copy()
     for item in range(len(dnac_inventory)):
         entry = temp_inv.pop()
@@ -253,7 +253,7 @@ def locate_aps(dnac_token, dnac_inventory):
             ap_uuid = entry["instanceUuid"]
             ap["ethMacAddress"] = get_ap_ethMac(dnac_token, ap_uuid)
             ap["location"] = entry["location"]
-            ap_inv[ap.get("hostname")] = ap
+            ap_inv.append(ap)
             ap_count = ap_count + 1
     print(ap_inv)
     ap_found = ap_count
@@ -280,7 +280,7 @@ def get_ap_ethMac(dnac_token, ap_uuid):
 def locate_wlcs(dnac_token, dnac_inventory):
     wlc_count = 0
     temp_inv = dnac_inventory.copy()
-    wlc_inv = {}
+    wlc_inv = []
     for item in range(len(dnac_inventory)):
         entry = temp_inv.pop()
         wlc = {}
@@ -290,7 +290,7 @@ def locate_wlcs(dnac_token, dnac_inventory):
             wlc["mgmntIP"] = entry["managementIpAddress"]
             wlc["location"] = entry["location"]
             wlc["instanceUuid"] = entry["instanceUuid"]
-            wlc_inv[wlc.get("hostname")] = wlc
+            wlc_inv.append(wlc)
             wlc_count = wlc_count + 1
     print(wlc_inv)
     wlc_found = len(wlc_inv)
