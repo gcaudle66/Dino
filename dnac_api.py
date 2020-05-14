@@ -15,7 +15,7 @@ global recent_urls
 global json_data
 
 dnac_token_expired = True
-dnac_savedCreds = True
+#dnac_savedCreds = False
 debug_status = False
 
 
@@ -161,7 +161,7 @@ json_data = []
 ##            main_menu()
 ##        else:
 ##            print("*********************************************************\n" \
-##                  "* WiFi Inventory Collection was a Success!              *\n" \
+##                  "* WiFi Inventory Collection was a Success! Dino got...  *\n" \
 ##                  f"* Total WLCs: {len(wifi_inv[0])}                       *\n" \
 ##                  f"* Total APs: {len(wifi_inv[1])}                        *\n" \
 ##                  "*********************************************************\n")
@@ -188,7 +188,14 @@ def get_dnac_token():
     else:
         data = token.json()
         dnac_token = data["Token"]
-        print("AUTH Token retrieved!")
+        print("\n" \
+              "        ##                                                \n" \
+              "       ##  Cha-Ching!                                     \n" \
+              "      ##     We got the Token!                            \n" \
+              " ##  ##                                                   \n" \
+              "  ####                                                    \n" \
+              "   ##                  ...API Auth-Token that is          \n" \
+              "                                                            ")
 ##        print(dnac_token)
         return dnac_token
 
@@ -223,9 +230,11 @@ def get_dnac_inventory():
     try:
         dnac_inventory = json_data["response"]
     except KeyError:
-        print("Received an error in response. Possible expired DNAC token.\n" \
-              "DEBUG can be enabled to help further troubleshoot.\n" \
-              "Current status of DEBUG being Enabled is : " + debug_status + "\n") 
+        print("*********************************************************\n" \
+              "* Received an error in response. Possible expired DNAC  *\n" \
+              "* token. DEBUG can be enabled to troubleshoot.          *\n" \
+              "* DEBUG is Enabled : " + debug_status + "               *\n" \
+              "*********************************************************\n") 
     else:
         return dnac_inventory
 

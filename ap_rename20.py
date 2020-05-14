@@ -11,8 +11,12 @@ global conn
 global connArgs
 global connIsAlive
 global matches
+global entries
+global forAPI
 matches = []
+entries = 0
 connArgs = {}
+forAPI = False
 final_CSVresults = []
 final_CLIresults = []
 final_APIresults = []
@@ -269,7 +273,77 @@ connIsAlive = False
 ##        conn.disconnect()
 ##        connIsAlive = conn.is_alive()
 ##        main()
-    
+
+
+def connex_split():
+    global entries
+    entries = 0
+    split_conns = []
+    split_conns.clear()
+    temp_matches = matches.copy()
+    counter = len(temp_matches)
+    while counter > 0:
+        for item in temp_matches:
+            wlc = [item[1].get("wlc")]
+            if wlc not in split_conns:
+                entry = wlc
+                split_conns.append(entry)
+                counter = counter - 1
+            elif wlc in split_conns:
+                index = split_conns[:].index(wlc)
+                #print(str(index), wlc)
+                counter = counter - 1
+    counter = len(split_conns)
+    for list in split_conns:
+            for y in temp_matches:
+                #print(y[1].get("wlc"))
+                if list[0] == y[1].get("wlc"):
+                    #print("match : " + list[0] + y[1].get("wlc"))
+                    list.append(y)
+                    entries = entries + 1
+            counter = counter - 1
+    print(entries)
+    return split_conns
+
+
+def create_connex_list(split_conns):
+    for entry in split_conns:
+        cli_commands = api_create_commands(entry)
+        entry.append(cli_commands)
+    connex_list = split_conns.copy()
+    return connex_list
+
+
+def api_create_commands(matches):
+    """ Here we will pull in the matches from main3 \n""" \
+    """ and create the commands to rename each AP   \n""" \
+    """ on the WLC and place them in the list named \n""" \
+    """ cli_commands to then pass to netmiko.       \n"""
+    cli_commands = []
+    index = 0
+    entries = len(matches)
+    temp_matches = matches.copy()
+    temp_matches.pop(0)
+    cmd2 = "show ap config general | include ^Cisco AP Name|^MAC Address"
+    try:
+        for entry in temp_matches:
+            cmd_old_name = temp_matches[index][1].get("Old_Name")
+            cmd_new_name = temp_matches[index][1].get("New_Name")
+            cmd1 = f"ap name {cmd_old_name} name {cmd_new_name}"
+            cli_commands.append(cmd1)
+            index = index + 1
+    except TypeError:
+        index = index + 1
+    except KeyError:
+        print("key error")
+        print(index)
+    except IndexError:
+        print("Index error")
+        print(index)
+    else:
+        cli_commands.append(cmd2)
+        return cli_commands
+
 
 def create_commands(matches):
     """ Here we will pull in the matches from main3 \n""" \
@@ -339,26 +413,82 @@ def compare(final_CSVresults, final_CLIresults):
     else:
         print("Done Inserting Matches")
         print(matches, sep="\n")
-    
+  
+
+def api_compare(content):
+    """ First we create 2 lists, 1 for matches and 1 for \n""" \
+    """ no-match. Then create another list with matched  \n""" \
+    """ MACs with a nested dict with old_name/new_name   \n""" \
+    """ which will be base for command build.            \n"""
+    match = []
+    no_match = []
+    global matches
+    ## Here we check the length of each list and pad the lesser
+    ## list with null pad entries to prevent throwing an index
+    ## error when looping
+    pad = ['null', 'inserted for padding']
+    content_len = len(content)
+    csv_len = len(final_CSVresults)
+    if content_len > csv_len:
+        diff = content_len - csv_len
+        for x in range(diff):
+            final_CSVresults.append(pad)
+    elif csv_len > content_len:
+        diff = csv_len - content_len
+        for x in range(diff):
+            content.append(pad)
+    else:
+        print("No Diff, no need to pad")
+    ## Here we loop through both lists looking for matching
+    ## MACs and add them to lists for matches and no-match
+    for x, y in [(x,y) for x in final_CSVresults for y in content]:
+        print(x[1], y[1])
+        print(x, y)
+        if x[1] == y[1]:
+            hit = [x, y]
+            print("Match:" + x[1] + " " + y[1])
+            match.append(hit)
+    ## Here we will loop through matches and create a final
+    ## list "matches" that has lists with nested DICTs with
+    ## the old_name/new_name key:value pairs
+    index = 0
+    for item in range(len(match)):
+        old_name = match[index][1][0]
+        new_name = match[index][0][0]
+        mac1 = match[index][0][1]
+        mac2 = match[index][1][1]
+        wlc = match[index][1][2]
+        if mac1 == mac2:
+            mentry = [mac1, {"Old_Name": old_name, "New_Name": new_name, "wlc": wlc}]
+            matches.append(mentry)
+            index = index + 1
+    else:
+        print("Done Inserting Matches")
+        print(matches, sep="\n")
+        
+
 
 def importCSV(file_list):
     """ Choose CSV file to import  that was found in local \n""" \
     """ directory.                                         \n"""
-    print("-------------------------------------------\n" \
-          "The files found are listed below.          \n" \
-          "Please select a number to select the file \n" \
-          "to import in.                              \n" \
-          "-------------------------------------------\n")
+    print("\n\n\n")
+    print("*********************************************************");
+    print("* Dino | AP Rename                                      *");
+    print("*********************************************************\n" \
+          f"* [{len(file_list)}] CSV files that were located are listed below      *\n" \
+          "* Please select the Choice number of the desired file   *\n" \
+          "* to import to begin parsing.                           *\n" \
+          "*********************************************************");
     index = 0
     choice = 0
     choices_list = {}
     for item in range(len(file_list)):
         item = file_list[index]
-        print("Choice # {} : {} ".format(index, item))
+        print("- Choice # [{}] : {} ".format(index, item))
         choice_entry = choices_list[index] = item
         index = index + 1
-    print(choices_list)
-    choice = int(input("Please select a file # from the list to import: "))
+    print("\n")
+    choice = int(input("Please input Choice # from the list to import: "))
     csv_choice = choices_list[choice]
     return parseCSV(csv_choice)
 
@@ -370,15 +500,35 @@ def get_conn_args():
     import getpass
     global connArgs
     global savedCredentials
-    print("Lets gather info for the WLC we will connect to....")
-    connArgs = {
-    "ip": input("Enter IP/Hostname of WLC: "),
-    "user": input("Enter username-'must have priv15' :"),
-    "pass": getpass.win_getpass("Enter password: ")}
-    correct = False
-    print("WLC Hostname/IP: " + connArgs["ip"] +  " | Username: " + connArgs["user"])
-    choice = 0
-    choice = int(input("Is the above connection info correct? 1=Yes, 2=No  : "))
+    global forAPI
+    print("*********************************************************");
+    print("* Dino | SSH ConneX                                     *");
+    print("*********************************************************");
+    print("* Lets gather info for the WLC we will connect to...    *");
+    if forAPI == False:
+        connArgs = {
+            "ip": input("* Enter IP/Hostname of WLC: "),
+            "user": input("* Enter username-'must have priv15' :"),
+            "pass": getpass.win_getpass("* Enter password: ")}
+        correct = False
+        print("*********************************************************");
+        print("* WLC Hostname/IP: " + connArgs["ip"])                  
+        print("* Username: " + connArgs["user"])
+        choice = 0
+        print("*           [1] Yes | [2] No or Ctrl-C to quit          *");
+        print("*********************************************************");
+    elif forAPI == True:
+        connArgs = {
+            "user": input("* Enter username-'must have priv15' :"),
+            "pass": getpass.win_getpass("* Enter password: ")}            
+        correct = False
+        print("*********************************************************");
+        print("*")# WLC Hostname/IP: " + connArgs["ip"])                  
+        print("* Username: " + connArgs["user"])
+        choice = 0
+        print("*           [1] Yes | [2] No or Ctrl-C to quit          *");
+        print("*********************************************************");
+    choice = int(input(" Is the above connection info correct? "))
     while correct == False:
         if choice == 1:
             correct = True
@@ -391,7 +541,56 @@ def get_conn_args():
             print("Invalid choice. Please try again or ctrl-c to exit")
             get_connArgs()
 
+def api_connect(conn_info):
+    global conn
+    global connIsAlive
+    global connArgs
+    attempts = 0
+    expPrompt = False
+    while connIsAlive is False:
+        try:
+            conn = ConnectHandler(ip=conn_info[0], username=connArgs["user"], password=connArgs["pass"], device_type="cisco_ios", session_log="ssh_session_logfile.txt", session_log_file_mode="write", session_log_record_writes="True")
+        except nm.NetMikoTimeoutException:
+            print("*********************************************************\n" \
+                  "* Error: Timeout Error Occured Attempting to            *\n" \
+                  "* connect. Check IP/Hostname and try Again              *\n" \
+                  "*********************************************************\n")
+        except nm.NetMikoAuthenticationException:
+            print("*********************************************************\n" \
+                  "* Error: Authentication Error Occured.                  *\n" \
+                  "* Check Credentials and try Again                       *\n" \
+                  "*********************************************************\n")
+        else:
+            connIsAlive = conn.is_alive()
+            if connIsAlive is True:
+                print("*********************************************************");
+                print("* Dino | SSH ConneX                                     *");
+                print("*********************************************************")
+                print("* SSH Connection Successful!                            *")
+                getPrompt = conn.find_prompt()
+                print("* We need to validate if this is the intended device    *")
+                print("*                                                       *")
+                print(f"* Device CLI prompt : {getPrompt}                     \n")
+                print("*                                                       *")
+                while expPrompt is False:
+                    choice = 0
+                    print("*         [1] Yes | [2] No or Ctrl-C to quit            *")
+                    print("*********************************************************")
+                    choice = int(input(" Is the above CLI prompt the prompt you were           *\n" \
+                                       " expecting from the correct WLC in PRIV EXEC mode? : \n"))
+                    if choice == 1:
+                        conn.disable_paging()
+                        expPrompt = True
+                        return conn
+                    elif choice == 2:
+                        print(f"Disconnecting Current SSH Session...") 
+                        conn.disconnect()
+                        connIsAlive = conn.is_alive()
+                        return conn
+            else:
+                print("Failure: Unknown Error. Sorry")
 
+    
 def connect():
     """ Here we will user connArgs gathered from get_conn_args \n""" \
     """ and establish connection to WLC                        \n"""
@@ -421,17 +620,21 @@ def connect():
         else:
             connIsAlive = conn.is_alive()
             if connIsAlive is True:
-                print("Connection Successful!")
+                print("*********************************************************");
+                print("* Dino | SSH ConneX                                     *");
+                print("*********************************************************")
+                print("* SSH Connection Successful!                            *")
                 getPrompt = conn.find_prompt()
-                print("-------------------------------------------\n" \
-                      "CONNECTED via SSH- \n" \
-                      f"Device returned : {getPrompt}               \n" \
-                      "-------------------------------------------\n")
+                print("* We need to validate if this is the intended device    *")
+                print("*                                                       *")
+                print(f"* Device CLI prompt : {getPrompt}                     \n")
+                print("*                                                       *")
                 while expPrompt is False:
                     choice = 0
-                    choice = int(input("Is the above CLI prompt the prompt you were\n" \
-                                       "expecting from the correct WLC in exec mode? \n" \
-                                       "1= Yes | 2=No or Ctrl-C to quit :  "))
+                    print("*         [1] Yes | [2] No or Ctrl-C to quit            *")
+                    print("*********************************************************")
+                    choice = int(input(" Is the above CLI prompt the prompt you were           *\n" \
+                                       " expecting from the correct WLC in PRIV EXEC mode? : \n"))
                     if choice == 1:
                         conn.disable_paging()
                         expPrompt = True
@@ -516,11 +719,12 @@ def parseCSV(csv_choice):
         try:
             parsedCSV_results = results_template.ParseText(content)
         except textfsm.TextFSMError:
-            err = input("-------------------------------------------\n" \
-                  "ERROR: Import error occured while parsing  \n" \
-                  "MAC Addresses. Invalid characters were found\n" \
-                  "on import. Check CSV file and try again.\n" \
-                  "-------------------------------------------")
+            err = input("*********************************************************\n" \
+                        "* Houston, we have a problem!                           *\n" \
+                  "* ERROR: Import error occured while parsing                   *\n" \
+                  "* MAC Addresses. Invalid characters were found                *\n" \
+                  "* on import. Check CSV file and try again.                    *\n" \
+                  "*********************************************************")
         else:
             return newLower_list(parsedCSV_results)
 
@@ -553,7 +757,8 @@ def parseAPI(wifi_inv):
         item = temp_inv[1][index]
         name = item.get("hostname")
         mac = item.get("ethMacAddress")
-        entry = [name, mac]
+        wlc = item.get("associatedWlcIp")
+        entry = [name, mac, wlc]
         index = index + 1
         parsedAPI.append(entry)
     return api_formatMacs(parsedAPI)
@@ -604,11 +809,12 @@ def formatMacs(content):
             print(f"Removing seperators: {mac}")
             if len(mac) > 12:
                 raise ValueError(
-                    print(input("-------------------------------------------\n" \
-                                "ERROR: Import error occured while parsing  \n" \
-                                "MAC Address " + mac + ". More than 12 characters\n" \
-                                "are present. Check CSV file and try again. \n" \
-                                "-------------------------------------------")))
+                    print(input("*********************************************************\n" \
+                                "* Houston, we have a problem!                           *\n" \
+                                "* ERROR: Import error occured while parsing             *\n" \
+                                "* MAC Address " + mac + ". More than 12 characters\n" \
+                                "* are present. Check CSV file and try again.            *\n" \
+                                "*********************************************************\n")))
             else:
                 new_mac = mac[:4] + "." + mac[4:8] + "." + mac[8:12]
                 print(f"Reformatted: {new_mac}")
@@ -617,15 +823,16 @@ def formatMacs(content):
                     new_entry = [entry[0], new_mac]
                     final_CSVresults.append(new_entry)
                 else:
-                     err = input("-------------------------------------------\n" \
-                           "ERROR: Unable to normalize MAC Address:    \n" \
-                           f" {new_mac}                                \n" \
-                           "Possible Non-Hex Character. Ignoring this entry\n"
-                           "Press Enter key to continue                \n" \
-                           "-------------------------------------------\n")
-    print("-------------------------------------------\n" \
-          "We located the below entries in the CSV file.\n" \
-          "-------------------------------------------\n")
+                     err = input("*********************************************************\n" \
+                                 "* Houston, we have a problem!                           *\n" \
+                                 "* ERROR: Unable to normalize MAC Address:               *\n" \
+                                 f"* {new_mac}                                            *\n" \
+                                 "* Possible Non-Hex Character. Ignoring this entry       *\n"
+                                 "* Press Enter key to continue                           *\n" \
+                                 "*********************************************************")
+    print("*********************************************************");
+    print("* The following entries were found in the imported CSV  *");
+    print("*********************************************************");
     for row in range(len(final_CSVresults)):
         print(final_CSVresults[row], sep="\n")
     return dino.api_main()
@@ -649,33 +856,35 @@ def api_formatMacs(content):
             print(f"Removing seperators: {mac}")
             if len(mac) > 12:
                 raise ValueError(
-                    print(input("-------------------------------------------\n" \
-                                "ERROR: Format error occured while parsing  \n" \
-                                "MAC Address " + mac + "                    \n" \
-                                "-------------------------------------------")))
+                    print(input("*********************************************************\n" \
+                                "* Houston, we have a problem!                           *\n"
+                                "* ERROR: Format error occured while parsing             *\n" \
+                                "* MAC Address " + mac + "                               *\n" \
+                                "*********************************************************\n")))
             else:
                 new_mac = mac[:4] + "." + mac[4:8] + "." + mac[8:12]
                 print(f"Reformatted: {new_mac}")
                 if re.match(re_fmt, new_mac):
                     print("Format is now correct...adding to list: " + new_mac)
-                    new_entry = [entry[0], new_mac]
+                    new_entry = [entry[0], new_mac, entry[2]]
                     final_APIresults.append(new_entry)
                 else:
-                     err = input("-------------------------------------------\n" \
-                           "ERROR: Unable to normalize MAC Address:    \n" \
-                           f" {new_mac}                                \n" \
-                           "Possible Non-Hex Character. Ignoring this entry\n"
-                           "Press Enter key to continue                \n" \
-                           "-------------------------------------------\n")
-    print("-------------------------------------------\n" \
-          " Format Complete for the below API Entries \n" \
-          "-------------------------------------------\n")
+                     err = input("*********************************************************\n" \
+                                 "* Houston, we have a problem!                           *\n" \
+                                 "* ERROR: Unable to normalize MAC Address:               *\n" \
+                                 f"* {new_mac}                                            *\n" \
+                                 "* Possible Non-Hex Character. Ignoring this entry       *\n"
+                                 "* Press Enter key to continue                           *\n" \
+                                 "*********************************************************")
+    print("*********************************************************");
+    print("* Formating Complete for the below MAC Entries          *");
+    print("*********************************************************");
     for row in range(len(final_APIresults)):
         print(final_APIresults[row], sep="\n")
     return final_APIresults
 
 
 if __name__ == "__main__":
-    """ Let the insanity begin """
+    """ This script is not intented to run on its own. Please import it. """
     print("This script is not intented to run on its own. Please import it.")
     quit()

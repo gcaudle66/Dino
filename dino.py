@@ -5,12 +5,13 @@ global dnac_savedCreds
 global dnac_connArgs
 global wifi_inv
 
+##dnac_savedCreds = True
+dnac_savedCreds = False
+##dnac_connArgs = {"cluster": "198.18.129.100",
+##                 "username": "admin",
+##                "password": "C1sco12345"}
+dnac_connArgs = {}
 
-dnac_savedCreds = True
-dnac_connArgs = {"cluster": "198.18.129.100",
-                 "username": "admin",
-                 "password": "C1sco12345"}
-##dnac_connArgs = {}
 # Version and Author Info
 __version__ = "2.0"
 __author__ = "Garrett Caudle | gcaudle66@gmail.com"
@@ -26,6 +27,28 @@ class Ap_Rename:
     def __init__(self, version, author):
         self.version = __version__
         self.author = __author__
+
+class ConnexList(object):
+	def __init__(self, match_list):
+		self.connexList = match_list
+		self.connexArgs = {}
+		self.sendCmds = []
+	def __enter__(self):
+		self.connexList = match_list.copy()
+		self.ConnexArgs = self.setConnArgs(self)
+		return self.connexList, ConnexArgs
+	def setConnArgs(self):
+		import getpass
+		self.connexArgs = {"ip": self.connexList[0]}
+		return self.connexArgs
+	def getConnArgs(self):
+		self.getConnArgs = print(self.connexArgs)
+	def getCmds(self):
+		self.sendCmds = ap_rename20.api_create_commands(connexList)
+		return self.sendCmds
+	def __exit__(self):
+		self.connexList.clear()
+
 
 def config():
     dnac_connArgs = {"cluster": "198.18.129.100",
@@ -61,21 +84,21 @@ def dino_main():
 def dino1_main():
     """
     """
+    print("\n\n\n")
     print("*********************************************************");
     print("* Dino | AP Rename Utility                              *");
+    print("*********************************************************");
     print("*                                                       *");
     print("* Import CSV - Ensure CSV file to import is placed in   *");
     print("*              current DIR and proceed.                 *");
     print("*                                                       *");
+    print("*                  [1] Yes | [2] No                     *");
     print("*********************************************************");
     cont = False
     choice = 0
-    choice = int(input("Are you ready to proceed? 1=Yes 2=No or Ctrl-C to quit: "))
+    choice = int(input("* Are you ready to proceed? : "))
     if choice == 1:
         cont = True
-        print("*********************************************************");
-        print("* Scanning current directory for CSV files...           *");
-        print("*********************************************************");
         cwd = os.getcwd()
         with os.scandir(path=cwd) as it:
             file_list = []
@@ -83,10 +106,70 @@ def dino1_main():
                 if entry.name.endswith(".csv") and entry.is_file():
                     file_list.append(entry.name)
             file_len = len(file_list)
-            print(f"Located {file_len} CSV files.")
             ap_rename20.importCSV(file_list)
     elif choice == 2:
         exit()
+
+
+def dino1_connex(matches):
+    """
+    """
+    split_conns = ap_rename20.connex_split()
+    ## Lets do a sanity check and make sure that length split_conns == matches
+    lenMatch = False
+    if ap_rename20.entries == len(ap_rename20.matches):
+        lenMatch = True
+    else:
+        print("*********************************************************");
+        print("* Dino | ConneX ERROR                                   *");
+        print("*********************************************************");
+        print("*                                                       *");
+        print("* Houston, we have a problem!                           *");
+        print("* For some unknown reason, the # of matches found       *");
+        print("* between the CSV and API do not match after parsing.   *");
+        print("* ERROR is unrecoverable! Please report to Dev team.    *");
+        print(f"*    Found: {entries} vs. {len(ap_rename20.matches)}      *");
+        print("* Press Enter key to restart program.                   *");
+        print("*                                                       *");
+        err = input("*********************************************************")
+        quit()
+    while lenMatch:
+        print("\n\n\n")
+        print("*********************************************************");
+        print("* Dino | AP Rename Utility                              *");
+        print("*********************************************************");
+        print("*                                                       *");
+        print("* SSH ConneX - Analysis of CSV and API data             *");
+        print("*********************************************************\n");
+        print(f"Matches found : {ap_rename20.entries}                         ")
+        print(f"Number of WLCs to connect to : {len(split_conns)} ")
+        print("*********************ATTENTION***************************");
+        print("Now we will start connecting to WLCs and making magic \n" \
+              "happen. The script ASSUMES the same username/password \n" \
+              "combo can be used across all WLCs in this process. If \n" \
+              "this is not the case, the script will fail as DINO is \n" \
+              "not setup to handle item-by-item authentication. Not \n" \
+              "that it cannot do it, it has the power, thats just to\n" \
+              "much typing and hassle for my creator to deal with. \n" \
+              "That said...\n" \
+              "-If WLCs share login info, Press [Enter] to continue\n" \
+              "-If not, exit script and resolve or run script per WLC\n")
+        print("*********************************************************");
+        cont = input("Shall we? : [Enter] to continue or [Ctrl-C] to exit")
+        print("And away we go...")
+        connex_list = ap_rename20.create_connex_list(split_conns)
+        ap_rename20.forAPI = True
+        connArgs = ap_rename20.get_conn_args()
+        temp_connex = connex_list.copy()
+        for entry in temp_connex:
+            length = len(entry)
+            cmds = length - 1
+            conn = ap_rename20.api_connect(entry)
+            if ap_rename20.connIsAlive:
+                ap_rename20.send_renameCmds(entry[cmds])
+
+
+
 
 ##def main():
 ##    """ Initial start of script and disclaimer.       \n""" \
@@ -155,6 +238,7 @@ def api_main():
     global dnac_savedCreds
     global dnac_connArgs
     while dnac_savedCreds == False:
+        print("\n\n\n")
         print("*********************************************************");
         print("* Dino | Cisco DNA Center REST API Connex               *");
         print("*                                                       *");
@@ -184,6 +268,7 @@ def api_main():
                 main()
                 break
     choice2 = 0
+    print("\n\n\n")
     print("*********************************************************");
     print("* Dino | Cisco DNA Center REST API Connex               *");
     print("*                                                       *");
@@ -206,6 +291,7 @@ def api_main2():
     """ 
     """
     choice = 0
+    print("\n\n\n")
     print("*********************************************************");
     print("* Dino | Cisco DNA Center REST API Connex               *");
     print("*                                                       *");
@@ -233,6 +319,7 @@ def api_main_menu():
     """
     """
     choice = 0
+    print("\n\n\n")
     print("*********************************************************");
     print("* Dino | Cisco DNA Center REST API Connex               *");
     print("*                                                       *");
@@ -258,12 +345,14 @@ def api_main_menu():
             print("Something went wonky and an exception got thrown")
             api_main_menu()
         else:
+            print("\n\n\n")
             print("*********************************************************\n" \
                   "* WiFi Inventory Collection was a Success!              *\n" \
                   f"* Total WLCs: {len(wifi_inv[0])}                                    *\n" \
                   f"* Total APs: {len(wifi_inv[1])}                                     *\n" \
                   "*********************************************************\n")
             if len(wifi_inv[1]) == 0:
+                    print("\n\n\n")
                     print("*********************************************************");
                     print("* Dino | Cisco DNA Center REST API Connex               *");
                     print("*********************************************************");
@@ -277,23 +366,13 @@ def api_main_menu():
                     print("*********************************************************");
                     err = input("*********************************************************")
                     dino_main()
-            return ap_rename20.parseAPI(wifi_inv)
+            parsedAPI = ap_rename20.parseAPI(wifi_inv)
+            matches = ap_rename20.api_compare(ap_rename20.final_APIresults)
+            return dino1_connex(ap_rename20.matches)
     elif choice == 2:
         dino_main()
     return wifi_inv
 
-##def main2():
-##    """ Validate that we have imported CSV         \n""" \
-##    """ data and now gather info for connecting to \n""" \
-##    """ WLC to gather data for comparison with CSV \n"""
-##    global conn
-##    print("-------------------------------------------\n" \
-##          "Now we will connect to  a WLC to pull currently\n" \
-##          " connected and Registered APs.\n" \
-##          "-------------------------------------------\n")
-##    conn = ap_rename20.connect()
-##    return ap_rename20.getApCli()
-    
 
 def main3():
     """ Validate that we have imported CSV and CLI    \n""" \
