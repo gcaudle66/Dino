@@ -73,9 +73,10 @@ def dino_main():
     print("*                                                       *");
     print("*                                                       *");                            
     print("*                                                       *");
-    print("* Control C to exit                                     *");
+    print("* Control-C to exit                                     *");
     print("*********************************************************");
     choice = int(input("* Intent Menu Choice [#] :  "))
+    print("\n\n\n")
     if choice == 1:
         dino1_main()
     elif choice == 2:
@@ -92,7 +93,7 @@ def dino1_main():
     print("* Import CSV - Ensure CSV file to import is placed in   *");
     print("*              current DIR and proceed.                 *");
     print("*                                                       *");
-    print("*                  [1] Yes | [2] No                     *");
+    print("*        [1] Yes | [2] No or Control-C to exit          *");
     print("*********************************************************");
     cont = False
     choice = 0
@@ -141,21 +142,25 @@ def dino1_connex(matches):
         print("*                                                       *");
         print("* SSH ConneX - Analysis of CSV and API data             *");
         print("*********************************************************\n");
-        print(f"Matches found : {ap_rename20.entries}                         ")
-        print(f"Number of WLCs to connect to : {len(split_conns)} ")
+        print("*                                                       *");
+        print(f"* Matches found : {ap_rename20.entries}                         ")
+        print(f"* Number of WLCs to connect to : {len(split_conns)} ")
+        print("*                                                       *");
         print("*********************ATTENTION***************************");
-        print("Now we will start connecting to WLCs and making magic \n" \
-              "happen. The script ASSUMES the same username/password \n" \
-              "combo can be used across all WLCs in this process. If \n" \
-              "this is not the case, the script will fail as DINO is \n" \
-              "not setup to handle item-by-item authentication. Not \n" \
-              "that it cannot do it, it has the power, thats just to\n" \
-              "much typing and hassle for my creator to deal with. \n" \
-              "That said...\n" \
-              "-If WLCs share login info, Press [Enter] to continue\n" \
-              "-If not, exit script and resolve or run script per WLC\n")
+        print(" Now we will start connecting to WLCs and making magic   \n" \
+              " happen. The script ASSUMES the same username/password   \n" \
+              " combo can be used across all WLCs in this process. If   \n" \
+              " this is not the case, the script will fail as DINO is   \n" \
+              " not setup to handle item-by-item authentication. Not    \n" \
+              " that it cannot do it, it has the power, thats just to   \n" \
+              " much typing and hassle for my creator to deal with.     \n" \
+              " With that said...                                       \n" \
+              "  -If WLCs share login info, Press [Enter] to continue   \n" \
+              "  -If not, exit script and resolve or run script per WLC \n")
         print("*********************************************************");
-        cont = input("Shall we? : [Enter] to continue or [Ctrl-C] to exit")
+        print("*                 Are you ready?? :                     *");
+        cont = input("      [Enter] to continue or [Ctrl-C] to exit            ")
+        print("\n\n")
         print("And away we go...")
         connex_list = ap_rename20.create_connex_list(split_conns)
         ap_rename20.forAPI = True
@@ -168,54 +173,26 @@ def dino1_connex(matches):
             if ap_rename20.connIsAlive:
                 ap_rename20.send_renameCmds(entry[cmds])
 
+def dino2_sync():
+    dnac_inv = []
+    dnac_inv = dnac_api.gather_inv_devices()
+    choice = 0
+    index = 0
+    print("*********************************************************");
+    print("* Dino | DNA-C Device ReSync                            *");
+    print("*********************************************************");
+    print("*                                                       *");
+    print("* Choose a device below to trigger a resync.            *");
+    print("*********************************************************\n");
+    for item in dnac_inv:
+        print("Choice #{} : Hostname: {} | Platform: {} |\n| MgmntIP: {}".format(index, item.get("hostname"), item.get("platformId"), item.get("mgmntIP")))
+        index = index + 1
+    print("*********************************************************\n");
+    choice = int(input(" Input device number : "))
+    dev_uuid = dnac_inv[choice].get("instanceUuid")
+    sync_response = dnac_api.put_sync_device(dev_uuid)
+    print(sync_response)
 
-
-
-##def main():
-##    """ Initial start of script and disclaimer.       \n""" \
-##    """ In this script we will...                     \n""" \
-##    """ -Scan for CSV files to import.                \n""" \
-##    """ -Connect to the chosen WLC and gather         \n""" \
-##    """ current registered APs -We will then parse    \n""" \
-##    """ that data and validate the data imported      \n""" \
-##    """ from CSV and data imported from WLC           \n""" \
-##    """ matches.-Then change the names on the WLC.    """
-##    print("-------------------------------------------\n" \
-##          "<----Welcome to AP Renamerer.---->\n" \
-##          "-------------------------------------------\n" \
-##          "In this script we will...\n" \
-##          "-Scan for CSV files to import.\n" \
-##          "-Connect to the chosen WLC and gather current registered APs\n" \
-##          "-We will then parse that data and validate the data imported from\n" \
-##          " CSV and data imported from WLC matches.\n-Then change the names " \
-##          " on the WLC.\n"\
-##          "-------------------------------------------\n" \
-##          "-------------------------------------------\n" \
-##          "-------------------------------------------\n" \
-##          "So first lets get the file to import.....\n" \
-##          "-!! Make sure any CSV files to import\n" \
-##          " are placed in the same directory as this\n" \
-##          " script before continuing !!-\n" \
-##          "-------------------------------------------\n")
-##    cont = False
-##    choice = 0
-##    choice = int(input("Are you ready to proceed? 1=Yes 2=No or Ctrl-C to quit: "))
-##    if choice == 1:
-##        cont = True
-##        print("-------------------------------------------\n" \
-##          "Scanning current directory for CSV files...\n" \
-##          "-------------------------------------------\n")
-##        cwd = os.getcwd()
-##        with os.scandir(path=cwd) as it:
-##            file_list = []
-##            for entry in it:
-##                if entry.name.endswith(".csv") and entry.is_file():
-##                    file_list.append(entry.name)
-##            file_len = len(file_list)
-##            print(f"Located {file_len} CSV files.")
-##            ap_rename20.importCSV(file_list)
-##    elif choice == 2:
-##        exit()
 
 def api_main():
     """ Where the magic begins
@@ -244,21 +221,22 @@ def api_main():
         print("*                                                       *");
         print("* Please provide the following data in order to connect *");
         print("*                                                       *");
-        print("* DNAC API IP: Cluster IP address for target DNA Center *");
-        print("* Username: [username]                                  *");
-        print("* Password: [password]                                  *");
-        print("*                                                       *");
-        print("*                                                       *");
-        print("* Control C to exit                                     *");
         print("*********************************************************");
-        dnac_connArgs = {
-            "cluster": input("DNAC API IP: "),
-            "username": input("Username:"),
-            "password": input("Password: ")}
+        print("\n")
+        dnac_connArgs = {"cluster": input("* DNA-C Hostname/IP : "),
+                        "username": input("* Username : "),
+                        "password": input("* Password : ")}
+        print("\n\n");
+        print("*********************************************************");
+        print("*                                                       *");
+        print("*  DNA-C Hostname/IP: " + dnac_connArgs["cluster"])
+        print("*  Username: " + dnac_connArgs["username"])
+        print("*                                                       *");
+        print("*        [1] Yes | [2] No or Control-C to exit          *")
+        print("*********************************************************");
         correct = False
-        print("DNAC API IP: " + dnac_connArgs["cluster"] + " | Username: " + dnac_connArgs["username"])
         choice = 0
-        choice = int(input("Is the above connection info correct? 1=Yes, 2=No  : "))
+        choice = int(input(" Is the above connection info correct? : "))
         while correct == False:
             if choice == 1:
                 correct = True
@@ -277,9 +255,10 @@ def api_main():
     print("* Script will now connect to the DNA Center API         *");
     print("* interface and retreive the Authentication Token       *");
     print("*                                                       *");
-    print("* Control C to exit                                     *");
+    print("*        [1] Yes | [2] No or Control-C to exit          *");
     print("*********************************************************");
-    choice2 = int(input("* Are you ready to proceed with this step? 1=Yes, 2=No  : "))
+    print("\n\n")
+    choice2 = int(input("* Are you ready to proceed with this step? : "))
     if choice2 == 1:
         dnac_token = dnac_api.get_dnac_token()
         return api_main2()
@@ -300,9 +279,10 @@ def api_main2():
     print("* Script will now GET full inventory of devices in      *");
     print("* DNA Center.                                           *");
     print("*                                                       *");
-    print("* Control C to exit                                     *");
+    print("*         [1] Yes | [2] No or Control-C to exit         *");
     print("*********************************************************");
-    choice = int(input("* Are you ready to proceed with this step? 1=Yes, 2=No  : "))
+    print("\n\n")
+    choice = int(input("* Are you ready to proceed with this step? : "))
     if choice == 1:
         try:
             dnac_api.dnac_inventory = dnac_api.get_dnac_inventory()
@@ -326,30 +306,41 @@ def api_main_menu():
     print("* -Success! Inventory collected from DNAC.              *");
     print("*                                                       *");
     print("*********************************************************");
-    print("* Choose next step to continue.          *");
+    print("* Choose next step to continue.                         *");
     print("* Intent Menu --------                                  *");
     print("*                                                       *");
     print("* [1] AP Rename - Process DNAC inventory for comparison *");
-    print("* [2] DNAC API - Force Inventory Resync All Devices     *");
-    print("*                                                       *");
+    print("* [2] DNAC API - Force Inventory Resync on Device       *");
+    print("* [9] Return to Main Menu                               *");
     print("*                                                       *");                            
     print("*                                                       *");
     print("* Control C to exit                                     *");
     print("*********************************************************");
     choice = int(input("* Intent Menu Choice [#] :  "))
+    print("\n\n")
     if choice == 1:
         wifi_inv = []
         try:
             wifi_inv = dnac_api.wifi_inventory(wifi_inv, dnac_connArgs)
         except Exception:
-            print("Something went wonky and an exception got thrown")
+            print("\n")
+            print("*********************************************************");
+            print("* Dino | Cisco DNA Center REST API Connex               *");
+            print("*********************************************************");
+            print("*                                                       *");
+            print("* Something went wonky and an exception got thrown      *");
+            print("*                                                       *");
+            print("*   Press Enter key to restart program or               *");
+            print("*     Control-C to exit                                 *");
+            print("*********************************************************");
+            err = input("*********************************************************")
             api_main_menu()
         else:
             print("\n\n\n")
             print("*********************************************************\n" \
                   "* WiFi Inventory Collection was a Success!              *\n" \
-                  f"* Total WLCs: {len(wifi_inv[0])}                                    *\n" \
-                  f"* Total APs: {len(wifi_inv[1])}                                     *\n" \
+                  f"* Total WLCs: [{len(wifi_inv[0])}]                      \n" \
+                  f"* Total APs: [{len(wifi_inv[1])}]                       \n" \
                   "*********************************************************\n")
             if len(wifi_inv[1]) == 0:
                     print("\n\n\n")
@@ -370,7 +361,7 @@ def api_main_menu():
             matches = ap_rename20.api_compare(ap_rename20.final_APIresults)
             return dino1_connex(ap_rename20.matches)
     elif choice == 2:
-        dino_main()
+        dino2_sync()
     return wifi_inv
 
 
