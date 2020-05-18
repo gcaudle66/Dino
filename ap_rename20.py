@@ -457,7 +457,7 @@ def send_renameCmds(cli_commands):
           "Script Complete. SSH session closed and    \n" \
           "The logfile is also saved locally in the   \n" \
           "current dir as ssh_session_logfile.txt     \n" \
-          "---------Press Ctrl-C to Exit--------------\n")
+          "----Press [Enter] to Return to Main Menu---\n")
 
     
 

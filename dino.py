@@ -139,7 +139,6 @@ def dino1_connex(matches):
         print("*********************************************************");
         print("* Dino | AP Rename Utility                              *");
         print("*********************************************************");
-        print("*                                                       *");
         print("* SSH ConneX - Analysis of CSV and API data             *");
         print("*********************************************************\n");
         print("*                                                       *");
@@ -172,6 +171,7 @@ def dino1_connex(matches):
             conn = ap_rename20.api_connect(entry)
             if ap_rename20.connIsAlive:
                 ap_rename20.send_renameCmds(entry[cmds])
+        api_main_menu()
 
 def dino2_sync():
     dnac_inv = []
@@ -184,14 +184,61 @@ def dino2_sync():
     print("*                                                       *");
     print("* Choose a device below to trigger a resync.            *");
     print("*********************************************************\n");
+    choices_nums = []
     for item in dnac_inv:
-        print("Choice #{} : Hostname: {} | Platform: {} |\n| MgmntIP: {}".format(index, item.get("hostname"), item.get("platformId"), item.get("mgmntIP")))
+        item = ("Choice #{} : Hostname: {} | Platform: {} |\n| MgmntIP: {}".format(index, item.get("hostname"), item.get("platformId"), item.get("mgmntIP")))
+        print(item)
+        choices_nums.append(index)
         index = index + 1
+    rtrn_choice_num = index + 1
+    rtrn_item = ("Choice #{} : Return to API Main Menu ".format(rtrn_choice_num))
     print("*********************************************************\n");
-    choice = int(input(" Input device number : "))
+    choice = int(input(" Input choice number from above : "))
     dev_uuid = dnac_inv[choice].get("instanceUuid")
-    sync_response = dnac_api.put_sync_device(dev_uuid)
-    print(sync_response)
+    if choice == rtrn_choice_num:
+        api_main_menu()
+    elif choice in choices_nums:
+            try:
+                sync_response = dnac_api.put_sync_device(dev_uuid)
+            except Exception:
+                print("*********************************************************");
+                print("* Dino | ConneX ERROR                                   *");
+                print("*********************************************************");
+                print("*                                                       *");
+                print("* Houston, we have a problem!                           *");
+                print("* An exception was raised for some reason, who knows!   *");
+                print("* Lets drop back to the main menu and try again.        *");
+                print("*********************************************************");
+                dino2_sync()
+            else:
+                print("*********************************************************");
+                print("* Dino | DNA-C Device ReSync                            *");
+                print("*********************************************************");
+                print("*                                                       *");
+                print("* Device resync was successfully triggered.             *");
+                print("*********************************************************\n");
+                print(sync_response)
+                prompt = input("[Enter] to Return to Main Menu or [Ctrl-C] to exit\n\n")
+                api_main_menu()
+    elif choice not in choices_nums:
+        print("*********************************************************");
+        print("* Dino | ConneX ERROR                                   *");
+        print("*********************************************************");
+        print("*                                                       *");
+        print("* Hmmm...that choice dont't make no sense??!!           *");
+        print("* It appears you have entered an invalid choice Number. *");
+        print("* Lets drop back and try again.                         *");
+        print("*********************************************************");
+    else:
+        print("*********************************************************");
+        print("* Dino | ConneX ERROR                                   *");
+        print("*********************************************************");
+        print("*                                                       *");
+        print("* Houston, we have a problem!                           *");
+        print("* Whatever you just entered, made no sense to us!       *");
+        print("* Please try again or Cntrl-C to Exit                   *");
+        print("*********************************************************")
+
 
 
 def api_main():
@@ -212,6 +259,8 @@ def api_main():
         --If match is found, matches are added to a llocal DICT containing
           the WLC "hostname" and "mgmntIPAddress"
     """
+    import getpass
+    import time
     global dnac_savedCreds
     global dnac_connArgs
     while dnac_savedCreds == False:
@@ -225,7 +274,7 @@ def api_main():
         print("\n")
         dnac_connArgs = {"cluster": input("* DNA-C Hostname/IP : "),
                         "username": input("* Username : "),
-                        "password": input("* Password : ")}
+                        "password": getpass.win_getpass("* Password : ")}
         print("\n\n");
         print("*********************************************************");
         print("*                                                       *");
@@ -236,34 +285,116 @@ def api_main():
         print("*********************************************************");
         correct = False
         choice = 0
-        choice = int(input(" Is the above connection info correct? : "))
-        while correct == False:
-            if choice == 1:
-                correct = True
-                dnac_savedCreds = True
-                dnac_connArgs
-            elif choice == 2:
-                main()
-                break
-    choice2 = 0
+        try:
+            choice = int(input(" Is the above connection info correct? : "))
+        except ValueError:
+            print("*********************************************************");
+            print("* Dino | ConneX ERROR                                   *");
+            print("*********************************************************");
+            print("*                                                       *");
+            print("* Houston, we have a problem!                           *");
+            print("* You entered a non-integer(number) character.          *");
+            print("* Please try again or Ctrl-C to Exit                    *");
+            print("*********************************************************")
+            try:
+                choice = int(input(" Is the above connection info correct? : "))
+            except ValueError:
+                print("*********************************************************");
+                print("* Dino | ConneX ERROR                                   *");
+                print("*********************************************************");
+                print("*                                                       *");
+                print("* OK, We Give Up!                                       *");
+                print("* We are expecting a number to be entered and failed.   *");
+                print("* Exiting to save ourself!                              *");
+                print("*********************************************************")
+                time.sleep(3)
+                quit()
+            else:
+                while correct == False:
+                    if choice == 1:
+                        correct = True
+                        dnac_savedCreds = True
+                        dnac_connArgs
+                        api_getToken()
+                    elif choice == 2:
+                        dnac_connArgs = {}
+                        api_main()
+                        break
+        else:
+            while correct == False:
+                if choice == 1:
+                    correct = True
+                    dnac_savedCreds = True
+                    dnac_connArgs
+                    api_getToken()
+                elif choice == 2:
+                    dnac_connArgs = {}
+                    api_main()
+                    break
+
+def api_getToken():
+    import time
+    import requests
+    global dnac_connArgs
     print("\n\n\n")
     print("*********************************************************");
     print("* Dino | Cisco DNA Center REST API Connex               *");
     print("*                                                       *");
-    print("* -Success! Connection info confirmed.                  *");
+    print("* -Connection info confirmed by user.                   *");
     print("*                                                       *");
     print("* Script will now connect to the DNA Center API         *");
     print("* interface and retreive the Authentication Token       *");
     print("*                                                       *");
-    print("*        [1] Yes | [2] No or Control-C to exit          *");
+    print("*    Press [Enter] to Continue or Control-C to exit     *");
     print("*********************************************************");
     print("\n\n")
-    choice2 = int(input("* Are you ready to proceed with this step? : "))
-    if choice2 == 1:
+    choice = input("")
+    try:
         dnac_token = dnac_api.get_dnac_token()
+    except requests.exceptions.ConnectionError as err:
+        print("Connection error: {0}".format(err))
+    except requests.urllib3.exceptions.MaxRetryError:
+        print("*********************************************************");
+        print("* Dino | ConneX ERROR                                   *");
+        print("*********************************************************");
+        print("*                                                       *");
+        print("* Houston, we have a problem!                           *");
+        print("* A timeout occured when connecting to DNA-Center on    *");
+        print("* the provided URL. Please validate the URL is correct  *");
+        print("* below and try again.                                  *");
+        print("* Press [Enter] to  try again or Ctrl-C to Exit         *");
+        print("*********************************************************")
+        print(dnac_connArgs.get("cluster"))
+        tryAgain = input("")
+        api_getToken()
+    except requests.ConnectTimeout:
+        print("*********************************************************");
+        print("* Dino | ConneX ERROR                                   *");
+        print("*********************************************************");
+        print("*                                                       *");
+        print("* Houston, we have a problem!                           *");
+        print("* A timeout occured when connecting to DNA-Center on    *");
+        print("* the provided URL. Please validate the URL is correct  *");
+        print("* below and try again.                                  *");
+        print("* Press [Enter] to  try again or Ctrl-C to Exit         *");
+        print("*********************************************************")
+        print(dnac_connArgs.get("cluster"))
+        tryAgain = input("")
+        api_getToken()
+    except requests.exceptions.InvalidURL:
+        print("*********************************************************");
+        print("* Dino | ConneX ERROR                                   *");
+        print("*********************************************************");
+        print("*                                                       *");
+        print("* Houston, we have a problem!                           *");
+        print("* The URL/IP provided below is invalid. Please re-enter it.*");                        
+        print("*********************************************************")
+        print(dnac_connArgs.get("cluster"))
+        time.sleep(3)
+        dnac_connArgs["cluster"] = input("* DNA-C Hostname/IP : ")
+        api_getToken()
+    else:
         return api_main2()
-    elif choice2 == 2:
-        api_main()
 
 
 def api_main2():

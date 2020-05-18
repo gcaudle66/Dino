@@ -3,7 +3,7 @@ from requests.auth import HTTPBasicAuth
 import base64
 import logging
 import dino
-requests.packages.urllib3.disable_warnings()
+#requests.packages.urllib3.disable_warnings()
 global debug_status
 global dnac_token
 global dnac_token_lifetime
@@ -20,7 +20,6 @@ debug_status = False
 
 
 
-json_data = []
 
 ## Common DNAC API URLs to call in functioons
 
@@ -40,7 +39,6 @@ def get_dnac_token():
         )
     except requests.exceptions.ConnectionError:
         print("Some error occured, likely a timeout")
-        ap_rename20.main2()
     else:
         data = token.json()
         dnac_token = data["Token"]
