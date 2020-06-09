@@ -18,7 +18,7 @@ dnac_token_expired = True
 #dnac_savedCreds = False
 debug_status = False
 
-
+json_data = []
 
 
 ## Common DNAC API URLs to call in functioons
@@ -27,6 +27,8 @@ debug_status = False
         
 def get_dnac_token():
     global dnac_token
+    global json_data
+    json_data = []
     try:
         token = requests.post(
         "https://" + dino.dnac_connArgs["cluster"] + "/dna/system/api/v1/auth/token",
@@ -41,6 +43,7 @@ def get_dnac_token():
         print("Some error occured, likely a timeout")
     else:
         data = token.json()
+        json_data.append(data)
         dnac_token = data["Token"]
         print("\n" \
               "        ##                                                \n" \
@@ -87,7 +90,7 @@ def get_dnac_inventory():
         print("*********************************************************\n" \
               "* Received an error in response. Possible expired DNAC  *\n" \
               "* token. DEBUG can be enabled to troubleshoot.          *\n" \
-              "* DEBUG is Enabled : " + debug_status + "               *\n" \
+              "* DEBUG is Enabled : " + str(debug_status) + "               *\n" \
               "*********************************************************\n") 
     else:
         return dnac_inventory
@@ -155,6 +158,7 @@ def wifi_inventory(wifi_inv, dnac_connArgs):
     return wifi_inv
 
 def locate_aps(dnac_token, dnac_inventory):
+    from dino import test_mode
     ap_count = 0
     ap_inv = []
     temp_inv = dnac_inventory.copy()
@@ -168,7 +172,10 @@ def locate_aps(dnac_token, dnac_inventory):
             ap["associatedWlcIp"] = entry["associatedWlcIp"]
             ap["instanceUuid"] = entry["instanceUuid"]
             ap_uuid = entry["instanceUuid"]
-            ap["ethMacAddress"] = get_ap_ethMac(dnac_token, ap_uuid)
+            if test_mode == True:
+                ap["ethMacAddress"] = entry["macAddress"]
+            elif test_mode == False:
+                ap["ethMacAddress"] = get_ap_ethMac(dnac_token, ap_uuid)
             ap["location"] = entry["location"]
             ap_inv.append(ap)
             ap_count = ap_count + 1
@@ -241,7 +248,85 @@ def enable_req_debug():
     debug_status = True
     return debug_status
     
+### THESE FOLLOWING FUNCTIONS ARE USED ONLY WHEN TESTING
+##  SITUATIONS ARE RECOGNIZED
+def test_get_dnac_token():
+    global dnac_token
+    import time
+    import requests
+    global dnac_connArgs
+    print("\n\n\n")
+    print("*********************************************************")
+    print("*     TEST FUNCTION CALLED** USED ONLY WHEN TESTING     *")
+    print("*        DETECTED LOOPBACK IP AND TEST API PORT         *")
+    print("*********************************************************")
+    print("* Dino | Cisco DNA Center REST API Connex               *");
+    print("*                                                       *");
+    print("* -Connection info confirmed by user.                   *");
+    print("*                                                       *");
+    print("* Script will now connect to the LOCAL TEST API SERVER  *");
+    print("* interface and retreive the TEST Authentication Token  *");
+    print("*                                                       *");
+    print("*    Press [Enter] to Continue or Control-C to exit     *");
+    print("*********************************************************");
+    print("\n\n")
+    choice = input("")
+    print("*********************************************************")
+    print("***TEST FUNCTION CALLED** USED ONLY WHEN TESTING        *")
+    print("*********************************************************")
+    try:
+        token = requests.post(
+        "https://" + dino.dnac_connArgs["cluster"] + "/dna/system/api/v1/auth/token",
+        auth=HTTPBasicAuth(
+           username = dino.dnac_connArgs["username"],
+           password = dino.dnac_connArgs["password"]
+        ),
+        headers={'content-type': 'application/json'},
+        verify=False,
+        )
+    except requests.exceptions.ConnectionError:
+        print("Some error occured, likely a timeout")
+    else:
+        data = token.json()
+        dnac_token = data[1]["Token"]
+        print("\n" \
+              "        ##                                                \n" \
+              "       ##  Cha-Ching!                                     \n" \
+              "      ##     We got the TEST Token!                            \n" \
+              " ##  ##                                                   \n" \
+              "  ####                                                    \n" \
+              "   ##  TEST FUNCTION CALLED** USED ONLY WHEN TESTING      \n" \
+              "                                                            ")
+        print(dnac_token)
+        return dino.api_main2() #dnac_token
 
+def test_get_dnac_inventory():
+    import json
+    global dnac_token
+    print("*********************************************************")
+    print("***TEST FUNCTION CALLED** USED ONLY WHEN TESTING        *")
+    print("*********************************************************")
+    inv_url = "/dna/intent/api/v1/network-device"
+    url = "https://" + dino.dnac_connArgs["cluster"] + inv_url
+    payload = {}
+    files = {}
+    headers = {}
+    response = requests.request("GET", url, headers=headers, data = payload, files = files, verify=False)
+    data = response.text.encode('utf8')
+    json_data = json.loads(data)
+    try:
+        dnac_inventory = json_data
+    except KeyError:
+        print("*********************************************************\n" \
+              "* Received an error in response. Possible expired DNAC  *\n" \
+              "* token. DEBUG can be enabled to troubleshoot.          *\n" \
+              "* DEBUG is Enabled : " + debug_status + "               *\n" \
+              "*********************************************************\n") 
+    else:
+        return dnac_inventory
+
+
+### END TESTING FUNCTIONS SECTION
 
 ##if __name__ == "__main__":
 ##    api_main()

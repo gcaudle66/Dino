@@ -295,54 +295,72 @@ def get_conn_args():
             print("Invalid choice. Please try again or ctrl-c to exit")
             get_connArgs()
 
-def api_connect(conn_info):
-    global conn
-    global connIsAlive
-    global connArgs
+def api_connex(connArgs, conn_info):
+    import netmiko as nm
     attempts = 0
     expPrompt = False
-    while connIsAlive is False:
-        try:
-            conn = ConnectHandler(ip=conn_info[0], username=connArgs["user"], password=connArgs["pass"], device_type="cisco_ios", session_log="ssh_session_logfile.txt", session_log_file_mode="write", session_log_record_writes="True")
-        except nm.NetMikoTimeoutException:
-            print("*********************************************************\n" \
-                  "* Error: Timeout Error Occured Attempting to            *\n" \
-                  "* connect. Check IP/Hostname and try Again              *\n" \
-                  "*********************************************************\n")
-        except nm.NetMikoAuthenticationException:
-            print("*********************************************************\n" \
-                  "* Error: Authentication Error Occured.                  *\n" \
-                  "* Check Credentials and try Again                       *\n" \
-                  "*********************************************************\n")
-        else:
-            connIsAlive = conn.is_alive()
-            if connIsAlive is True:
+    try:
+        net_connect = nm.BaseConnection(ip=conn_info[0], username=connArgs["user"], password=connArgs["pass"], session_log="ssh_session_logfile{}.txt".format(conn_info[2]), session_log_file_mode="write", session_log_record_writes="True")
+    except nm.NetMikoTimeoutException:
+        print("*********************************************************\n")
+        print("* ERROR: Connection to {} timed-out.     \n".format(conn_info[0]))
+        print("*  Skipping this entry for now...                              ")
+        print("*********************************************************\n")
+        #continue
+    except nm.NetMikoAuthenticationException:
+        print("*********************************************************\n")
+        print("* ERROR: Authentication Error Occured on {} using {}\n".format(conn_info[0], connArgs["user"]))
+        print("*  Skipping this entry for now...\n")
+        print("*********************************************************\n")
+        #continue
+    else:
+        connIsAlive = net_connect.is_alive()
+        if connIsAlive is True:
+            print("*********************************************************");
+            print("* Dino | SSH ConneX Success                                     *");
+            print("*********************************************************")
+            print("*                                                       *")
+            getPrompt = net_connect.find_prompt()
+            print("* We need to validate if this is the intended device    *")
+            print("*                                                       *")
+            print(f"* Device CLI prompt : {getPrompt}                     \n")
+            print("*                                                       *")
+        while expPrompt is False:
+            choice = 0
+            print("*         [1] Yes | [2] No or Ctrl-C to quit            *")
+            print("*********************************************************")
+            choice = int(input(" Is the above CLI prompt the prompt you were           *\n" \
+                       " expecting from the correct WLC in PRIV EXEC mode? : \n"))
+            if choice == 1:
+                net_connect.disable_paging()
+                expPrompt = True
+                print(f"Dino - ConneX now sending commands to {conn_info[0]}. Standby...\n\n")
+                output = net_connect.send_config_set(config_commands=conn_info[1], enter_config_mode=False, cmd_verify=False, exit_config_mode=False)
+                print("Commands sent OK, now cleaning up. Logfile ssh_session_logfile{}.txt created\n\n".format(conn_info[2])) 
                 print("*********************************************************");
-                print("* Dino | SSH ConneX                                     *");
+                print(f"* Dino | ConneX Disconnecting SSH to {conn_info[0]}      ");
                 print("*********************************************************")
-                print("* SSH Connection Successful!                            *")
-                getPrompt = conn.find_prompt()
-                print("* We need to validate if this is the intended device    *")
-                print("*                                                       *")
-                print(f"* Device CLI prompt : {getPrompt}                     \n")
-                print("*                                                       *")
-                while expPrompt is False:
-                    choice = 0
-                    print("*         [1] Yes | [2] No or Ctrl-C to quit            *")
-                    print("*********************************************************")
-                    choice = int(input(" Is the above CLI prompt the prompt you were           *\n" \
-                                       " expecting from the correct WLC in PRIV EXEC mode? : \n"))
-                    if choice == 1:
-                        conn.disable_paging()
-                        expPrompt = True
-                        return conn
-                    elif choice == 2:
-                        print(f"Disconnecting Current SSH Session...") 
-                        conn.disconnect()
-                        connIsAlive = conn.is_alive()
-                        return conn
-            else:
-                print("Failure: Unknown Error. Sorry")
+                net_connect.disconnect()
+                conn_status = "Session Success"
+                return conn_status
+            elif choice == 2:
+                print("*********************************************************");
+                print(f"* Dino | ConneX Disconnecting SSH to {conn_info[0]}     ");
+                print("*********************************************************")
+                net_connect.disconnect()
+                connIsAlive = net_connect.is_alive()
+                conn_status = "User Interupt - Expected prompt mismatch"
+                return conn_status
+            elif choice != int:
+                print("*********************************************************");
+                print("* Dino | ConneX ERROR                                   *");
+                print("*********************************************************");
+                print("*                                                       *");
+                print(f"* Say What?! Expecting Integer and recieved {choice}   *");
+                print("* Try again                                             *");
+                continue
+        else:
+            print("Failure: Unknown Error. Sorry")
 
     
 def connect():
