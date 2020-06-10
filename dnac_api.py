@@ -3,9 +3,10 @@ from requests.auth import HTTPBasicAuth
 import base64
 import logging
 import dino
-#requests.packages.urllib3.disable_warnings()
+requests.packages.urllib3.disable_warnings()
 global debug_status
 global dnac_token
+global local_dnac_connArgs
 global dnac_token_lifetime
 global dnac_token_expired
 ##global dnac_savedCreds
@@ -14,6 +15,7 @@ global dnac_inventory
 global recent_urls
 global json_data
 
+local_dnac_connArgs = {}
 dnac_token_expired = True
 #dnac_savedCreds = False
 debug_status = False
@@ -23,18 +25,49 @@ json_data = []
 
 ## Common DNAC API URLs to call in functioons
 
-
+##def get_dnac_token():
+##    import dino
+##    global dnac_token
+##    global json_data
+##    json_data = []
+##    try:
+##        token = requests.post(
+##        "https://" + dino.dnac_connArgs["cluster"] + "/dna/system/api/v1/auth/token",
+##        auth=HTTPBasicAuth(
+##           username = dino.dnac_connArgs["username"],
+##           password = dino.dnac_connArgs["password"]
+##        ),
+##        headers={'content-type': 'application/json'},
+##        verify=False,
+##        )
+##    except requests.exceptions.ConnectionError:
+##        print("Some error occured, likely a timeout")
+##    else:
+##        data = token.json()
+##        json_data.append(data)
+##        dnac_token = data["Token"]
+##        print("\n" \
+##              "        ##                                                \n" \
+##              "       ##  Cha-Ching!                                     \n" \
+##              "      ##     We got the Token!                            \n" \
+##              " ##  ##                                                   \n" \
+##              "  ####                                                    \n" \
+##              "   ##                  ...API Auth-Token that is          \n" \
+##              "                                                            ")
+##        return dnac_token
         
-def get_dnac_token():
+def get_dnac_token(dnac_connArgs):
     global dnac_token
+    global local_dnac_connArgs
     global json_data
+    local_dnac_connArgs = dnac_connArgs.copy()
     json_data = []
     try:
         token = requests.post(
-        "https://" + dino.dnac_connArgs["cluster"] + "/dna/system/api/v1/auth/token",
+        "https://" + dnac_connArgs["cluster"] + "/dna/system/api/v1/auth/token",
         auth=HTTPBasicAuth(
-           username = dino.dnac_connArgs["username"],
-           password = dino.dnac_connArgs["password"]
+           username = dnac_connArgs["username"],
+           password = dnac_connArgs["password"]
         ),
         headers={'content-type': 'application/json'},
         verify=False,
@@ -53,13 +86,12 @@ def get_dnac_token():
               "  ####                                                    \n" \
               "   ##                  ...API Auth-Token that is          \n" \
               "                                                            ")
-##        print(dnac_token)
         return dnac_token
 
 def get_device_WifiInfo(dnac_token, ap_uuid):
     import json
     ap_WifiInfo_url = "/dna/intent/api/v1/network-device/" + ap_uuid + "/wireless-info"
-    url = "https://" + dnac_connArgs["cluster"] + ap_WifiInfo_url
+    url = "https://" + local_dnac_connArgs["cluster"] + ap_WifiInfo_url
     payload = {}
     files = {}
     headers = {
@@ -75,7 +107,7 @@ def get_dnac_inventory():
     import json
     global dnac_token
     inv_url = "/dna/intent/api/v1/network-device"
-    url = "https://" + dino.dnac_connArgs["cluster"] + inv_url
+    url = "https://" + local_dnac_connArgs["cluster"] + inv_url
     payload = {}
     files = {}
     headers = {
@@ -127,7 +159,7 @@ def put_sync_device(body):
     import json
     sync_url = "/dna/intent/api/v1/network-device/sync?forceSync=True"
     payload = "[\n    \"" + body + "\"\n]"
-    url = "https://" + dino.dnac_connArgs["cluster"] + sync_url
+    url = "https://" + local_dnac_connArgs["cluster"] + sync_url
     files = {}
     headers = {
         'Content-Type': 'application/json',
@@ -189,7 +221,7 @@ def get_ap_ethMac(dnac_token, ap_uuid):
     import json
 ##    global dnac_token
     ap_WifiInfo_url = "/dna/intent/api/v1/network-device/" + ap_uuid + "/wireless-info"
-    url = "https://" + dino.dnac_connArgs["cluster"] + ap_WifiInfo_url
+    url = "https://" + local_dnac_connArgs["cluster"] + ap_WifiInfo_url
     payload = {}
     files = {}
     headers = {

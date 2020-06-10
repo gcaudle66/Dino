@@ -93,7 +93,7 @@ def dino_main():
         print("*                                                       *");
         print("* [1] AP Rename Utility (Use DNAC for AP->WLC Mappings) *");
         print("* [2] AP Renamer Classic v1.8 (Single WLC)              *");
-        print("*                                                       *");
+        print("* [3] DNAC API ConneX                                   *");
         print("*                                                       *");                            
         print(f"*                                                       *");
         print("* Control-C to exit                                     *");
@@ -139,6 +139,9 @@ def dino_main():
                 import ap_rename18 as ap18
                 ap18.__name__ == "__main__"
                 ap18.main()
+                break
+            elif choice == 3:
+                api_main()
                 break
             elif choice == 9:
                 DEBUGstatus = debugy(True)
@@ -222,7 +225,7 @@ def dino1_main():
                     ap_rename20.importCSV(file_list)
                 break
             elif choice == 2:
-                quit()
+                dino_main()
                 break
             else:
                 print("\n\n")
@@ -244,10 +247,25 @@ def dino1_main():
 def dino1_connex(matches):
     """
     """
+    if len(ap_rename20.matches) == 0:
+        print("*********************************************************");
+        print("* Dino | ConneX ERROR                                   *");
+        print("*********************************************************");
+        print("*                                                       *");
+        print("*             Houston, we have a problem!               *");
+        print("* Dino is unable to find any matches between the CSV    *");
+        print("* file that was imported and the APs that were listed   *");
+        print("* in the inventory pulled from DNA Center.              *");
+        print("*                                                       *");
+        print(f"* Could be our issue...could be yours!                  *");
+        print("* Press Enter key to return to Main Menu                *");
+        print("*                                                       *");
+        err = input("*********************************************************")
+        quit()
     split_conns = ap_rename20.connex_split()
     ## Lets do a sanity check and make sure that length split_conns == matches
     lenMatch = False
-    if ap_rename20.entries == len(ap_rename20.matches):
+    if (ap_rename20.entries == len(ap_rename20.matches)) and (len(ap_rename20.matches) > 0):
         lenMatch = True
     else:
         print("*********************************************************");
@@ -255,11 +273,11 @@ def dino1_connex(matches):
         print("*********************************************************");
         print("*                                                       *");
         print("* Houston, we have a problem!                           *");
-        print("* For some unknown reason, the # of matches found       *");
+        print("* For some reason, the # of matches found               *");
         print("* between the CSV and API do not match after parsing.   *");
-        print("* ERROR is unrecoverable! Please report to Dev team.    *");
+        print("* ERROR is unrecoverable! Quit and Relaunch program.    *");
         print(f"*    Found: {entries} vs. {len(ap_rename20.matches)}      *");
-        print("* Press Enter key to restart program.                   *");
+        print("* Press Enter key to quit program.                   *");
         print("*                                                       *");
         err = input("*********************************************************")
         quit()
@@ -321,6 +339,7 @@ def dino1_connex_build(split_conns):
                            "  or Ctrl-C to quit                       ")
             api_main_menu()
             break
+
 
 def dino1_connex_handler(connArgs, connex_list):
     """
@@ -522,9 +541,9 @@ def api_main():
                                 pass
                             else:
                                 break
-                        else:
-                            api_getToken()
-                            break
+                    else:
+                        api_getToken()
+                        break
                 elif choice == 2:
                     dnac_connArgs = {}
                     api_main()
@@ -582,7 +601,7 @@ def api_getToken():
         print("\n\n")
         choice = input("")
         try:
-            dnac_token = dnac_api.get_dnac_token()
+            dnac_token = dnac_api.get_dnac_token(dnac_connArgs)
         except ValueError as verr:
             #logging.debug("Exception occured as: " + str(verr))
             print("\n\n")
@@ -670,6 +689,9 @@ def api_main2():
                 print("Something went wonky and an exception got thrown")
                 api_main2()
             else:
+                print("\n\n")
+                print(" -Success! Inventory collected from DNAC. \n" \
+                      "  Inventory Item Count: {} \n".format(len(dnac_api.dnac_inventory)))
                 return api_main_menu()
     elif choice == 2:
         api_main()
@@ -682,16 +704,16 @@ def api_main_menu():
     choice = 0
     print("\n\n\n")
     print("*********************************************************");
-    print("* Dino | Cisco DNA Center REST API Connex               *");
     print("*                                                       *");
-    print("* -Success! Inventory collected from DNAC.              *");
+    print("* Dino | ConneX <-|-> DNA Center API Main Menu          *");
+    print("*                                                       *");
     print("*                                                       *");
     print("*********************************************************");
     print("* Choose next step to continue.                         *");
     print("* Intent Menu --------                                  *");
     print("*                                                       *");
-    print("* [1] AP Rename - Process DNAC inventory for comparison *");
-    print("* [2] DNAC API - Force Inventory Resync on Device       *");
+    print("* [1] AP Rename Cont'd - DNAC->CSV Comparison & Finalize*");
+    print("* [2] Resync Device - Force Inventory Resync on Device  *");
     print("* [9] Return to Main Menu                               *");
     print("*                                                       *");                            
     print("*                                                       *");
@@ -703,7 +725,7 @@ def api_main_menu():
         wifi_inv = []
         try:
             wifi_inv = dnac_api.wifi_inventory(wifi_inv, dnac_connArgs)
-        except Exception:
+        except Exception as exc:
             print("\n")
             print("*********************************************************");
             print("* Dino | Cisco DNA Center REST API Connex               *");
@@ -714,6 +736,7 @@ def api_main_menu():
             print("*   Press Enter key to restart program or               *");
             print("*     Control-C to exit                                 *");
             print("*********************************************************");
+            print(exc)
             err = input("*********************************************************")
             api_main_menu()
         else:
@@ -729,15 +752,22 @@ def api_main_menu():
                     print("* Dino | Cisco DNA Center REST API Connex               *");
                     print("*********************************************************");
                     print("*                                                       *");
-                    print("* Houston, we have a problem!                           *");
-                    print("* No APs we were found when DNAC was polled.            *");
+                    print("*            Houston, we have a problem!                *");
+                    print("* No APs we were found in the inventory that Dino       *");
+                    print("* pulled from DNA Center. Printing all device \"family\"  *");
+                    print("* and \"platformIds\" in the DNAC inventory below.       *");
+                    print("* If any APs are in fact in the inventory, capture this *");
+                    print("* output and send to dev-team advising them it no worky!*");
                     print("*                                                       *");
-                    print("* Press Enter key to restart program.                   *");
-                    print("*                                                       *");
-                    print("* Control C to exit                                     *");
+                    print("* Dino will now quit to flush any data just in case.    *");
+                    print("* Press [Enter] to quit then relaunch Dino.             *");
                     print("*********************************************************");
+                    for item in dnac_api.dnac_inventory:
+                        print(item.get("family"))
+                        print(item.get("platformId"))
+                        print("---------------------")
                     err = input("*********************************************************")
-                    dino_main()
+                    quit()
             parsedAPI = ap_rename20.parseAPI(wifi_inv)
             matches = ap_rename20.api_compare(ap_rename20.final_APIresults)
             return dino1_connex(ap_rename20.matches)
