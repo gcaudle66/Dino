@@ -297,24 +297,29 @@ def get_conn_args():
 
 def api_connex(connArgs, conn_info):
     import netmiko as nm
+    import time
     attempts = 0
     expPrompt = False
+    start1 = time.perf_counter()
     try:
         net_connect = nm.BaseConnection(ip=conn_info[0], username=connArgs["user"], password=connArgs["pass"], session_log="ssh_session_logfile{}.txt".format(conn_info[2]), session_log_file_mode="write", session_log_record_writes="True")
     except nm.NetMikoTimeoutException:
         print("*********************************************************\n")
         print("* ERROR: Connection to {} timed-out.     \n".format(conn_info[0]))
-        print("*  Skipping this entry for now...                              ")
+        print("* Skipping this entry for now...                              ")
         print("*********************************************************\n")
         #continue
     except nm.NetMikoAuthenticationException:
         print("*********************************************************\n")
         print("* ERROR: Authentication Error Occured on {} using {}\n".format(conn_info[0], connArgs["user"]))
-        print("*  Skipping this entry for now...\n")
+        print("* Skipping this entry for now...\n")
         print("*********************************************************\n")
         #continue
     else:
         connIsAlive = net_connect.is_alive()
+        stop1 = time.perf_counter()
+        print("Elapsed time for connection(secs): ",
+              stop1 - start1) 
         if connIsAlive is True:
             print("*********************************************************");
             print("* Dino | SSH ConneX Success                                     *");
@@ -335,13 +340,17 @@ def api_connex(connArgs, conn_info):
                 net_connect.disable_paging()
                 expPrompt = True
                 print(f"Dino - ConneX now sending commands to {conn_info[0]}. Standby...\n\n")
+                start2 = time.perf_counter()
                 output = net_connect.send_config_set(config_commands=conn_info[1], enter_config_mode=False, cmd_verify=False, exit_config_mode=False)
                 print("Commands sent OK, now cleaning up. Logfile ssh_session_logfile{}.txt created\n\n".format(conn_info[2])) 
                 print("*********************************************************");
                 print(f"* Dino | ConneX Disconnecting SSH to {conn_info[0]}      ");
                 print("*********************************************************")
                 net_connect.disconnect()
+                stop2 = time.perf_counter()
                 conn_status = "Session Success"
+                print("Elapsed time to send and cleanup(secs): ",
+                      stop2 - start2) 
                 return conn_status
             elif choice == 2:
                 print("*********************************************************");

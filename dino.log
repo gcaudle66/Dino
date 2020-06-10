@@ -1,0 +1,130 @@
+DEBUG:urllib3:Added a stderr logging handler to logger: urllib3
+ERROR:root:Fatal__error__
+NoneType: None
+ERROR:root:Exception_thrown__
+NoneType: None
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): 198.18.129.100:443
+DEBUG:urllib3.connectionpool:https://198.18.129.100:443 "POST /dna/system/api/v1/auth/token HTTP/1.1" 200 727
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): 198.18.129.100:443
+DEBUG:urllib3.connectionpool:https://198.18.129.100:443 "GET /dna/intent/api/v1/network-device HTTP/1.1" 200 None
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): 198.18.129.100:443
+DEBUG:urllib3.connectionpool:https://198.18.129.100:443 "GET /dna/intent/api/v1/network-device/685951f6-9c53-4237-9054-2d7a90e5b192/wireless-info HTTP/1.1" 200 None
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): 198.18.129.100:443
+DEBUG:urllib3.connectionpool:https://198.18.129.100:443 "GET /dna/intent/api/v1/network-device/6f133b02-9b32-43f6-9b13-f623d7d075d3/wireless-info HTTP/1.1" 200 None
+DEBUG:paramiko.transport:starting thread (client mode): 0x4401bb0
+DEBUG:paramiko.transport:Local version/idstring: SSH-2.0-paramiko_2.7.1
+DEBUG:paramiko.transport:Remote version/idstring: SSH-2.0-Cisco-1.25
+INFO:paramiko.transport:Connected (version 2.0, client Cisco-1.25)
+DEBUG:paramiko.transport:kex algos:['diffie-hellman-group-exchange-sha1', 'diffie-hellman-group14-sha1'] server key:['ssh-rsa'] client encrypt:['aes128-ctr', 'aes192-ctr', 'aes256-ctr'] server encrypt:['aes128-ctr', 'aes192-ctr', 'aes256-ctr'] client mac:['hmac-sha2-256', 'hmac-sha2-512', 'hmac-sha1', 'hmac-sha1-96'] server mac:['hmac-sha2-256', 'hmac-sha2-512', 'hmac-sha1', 'hmac-sha1-96'] client compress:['none'] server compress:['none'] client lang:[''] server lang:[''] kex follows?False
+DEBUG:paramiko.transport:Kex agreed: diffie-hellman-group-exchange-sha1
+DEBUG:paramiko.transport:HostKey agreed: ssh-rsa
+DEBUG:paramiko.transport:Cipher agreed: aes128-ctr
+DEBUG:paramiko.transport:MAC agreed: hmac-sha2-256
+DEBUG:paramiko.transport:Compression agreed: none
+DEBUG:paramiko.transport:Got server p (2048 bits)
+DEBUG:paramiko.transport:kex engine KexGex specified hash_algo <built-in function openssl_sha1>
+DEBUG:paramiko.transport:Switch to new keys ...
+DEBUG:paramiko.transport:Adding ssh-rsa host key for 198.18.134.100: b'9d3b7b160e8c993b587e832b1376282f'
+DEBUG:paramiko.transport:userauth is OK
+INFO:paramiko.transport:Authentication (password) successful!
+DEBUG:paramiko.transport:[chan 0] Max packet in: 32768 bytes
+DEBUG:paramiko.transport:[chan 0] Max packet out: 4096 bytes
+DEBUG:paramiko.transport:Secsh channel 0 opened.
+DEBUG:paramiko.transport:[chan 0] Sesch channel 0 request ok
+DEBUG:paramiko.transport:[chan 0] Sesch channel 0 request ok
+DEBUG:netmiko:read_channel: 
+
+
+C9800-WLC#
+DEBUG:netmiko:read_channel: 
+DEBUG:netmiko:read_channel: 
+DEBUG:netmiko:read_channel: 
+DEBUG:netmiko:write_channel: b'\n'
+DEBUG:netmiko:read_channel: 
+C9800-WLC#
+DEBUG:netmiko:read_channel: 
+DEBUG:netmiko:[find_prompt()]: prompt is C9800-WLC#
+DEBUG:netmiko:read_channel: 
+DEBUG:netmiko:In disable_paging
+DEBUG:netmiko:Command: terminal length 0
+
+DEBUG:netmiko:write_channel: b'terminal length 0\n'
+DEBUG:netmiko:Pattern is: terminal\ length\ 0
+DEBUG:netmiko:_read_channel_expect read_data: t
+DEBUG:netmiko:_read_channel_expect read_data: erminal length 0
+C9800-WLC#
+DEBUG:netmiko:Pattern found: terminal\ length\ 0 terminal length 0
+C9800-WLC#
+DEBUG:netmiko:terminal length 0
+C9800-WLC#
+DEBUG:netmiko:Exiting disable_paging
+DEBUG:netmiko:write_channel: b'terminal width 511\n'
+DEBUG:netmiko:Pattern is: terminal\ width\ 511
+DEBUG:netmiko:_read_channel_expect read_data: te
+DEBUG:netmiko:_read_channel_expect read_data: rminal width 511
+C9800-WLC#
+DEBUG:netmiko:Pattern found: terminal\ width\ 511 terminal width 511
+C9800-WLC#
+DEBUG:netmiko:read_channel: 
+DEBUG:netmiko:Sending the NULL byte
+DEBUG:netmiko:write_channel: b'\x00'
+DEBUG:netmiko:read_channel: ^@
+C9800-WLC#
+DEBUG:netmiko:Clear buffer detects data in the channel
+DEBUG:netmiko:read_channel: 
+DEBUG:netmiko:write_channel: b'\n'
+DEBUG:netmiko:read_channel: 
+C9800-WLC#
+DEBUG:netmiko:read_channel: 
+DEBUG:netmiko:[find_prompt()]: prompt is C9800-WLC#
+DEBUG:netmiko:read_channel: 
+DEBUG:netmiko:In disable_paging
+DEBUG:netmiko:Command: terminal length 0
+
+DEBUG:netmiko:write_channel: b'terminal length 0\n'
+DEBUG:netmiko:Pattern is: terminal\ length\ 0
+DEBUG:netmiko:_read_channel_expect read_data: t
+DEBUG:netmiko:_read_channel_expect read_data: erminal length 0
+C9800-WLC#
+DEBUG:netmiko:Pattern found: terminal\ length\ 0 terminal length 0
+C9800-WLC#
+DEBUG:netmiko:terminal length 0
+C9800-WLC#
+DEBUG:netmiko:Exiting disable_paging
+DEBUG:netmiko:Sending the NULL byte
+DEBUG:netmiko:write_channel: b'\x00'
+DEBUG:netmiko:write_channel: b'ap name AP78BC.1ADB.CB1C name ap.black.pearl.conf1\n'
+DEBUG:netmiko:write_channel: b'ap name AP78BC.1ADB.CDCA name ap.flying.dutchman.lobby2\n'
+DEBUG:netmiko:write_channel: b'show ap config general | include ^Cisco AP Name|^MAC Address\n'
+DEBUG:netmiko:read_channel: ^@
+C9800-WLC#ap name AP78BC.1ADB.CB1C name ap.black.pearl.conf1
+
+DEBUG:netmiko:read_channel: C9800-WLC#ap name AP78BC.1ADB.CDCA name ap.flying
+DEBUG:netmiko:read_channel: .dutchman.lobby2
+C9800-WLC#show ap config general | in
+DEBUG:netmiko:read_channel: clude ^Cisco AP Name|^MAC Address
+
+DEBUG:netmiko:read_channel: 
+DEBUG:netmiko:read_channel: Cisco AP Name   : ap.black.pearl.conf1
+MAC Address                                     : 78bc.1adb.cb1c
+Cisco AP Name   : ap.flying.dutchman.lobby2
+MAC Address                                     : 78bc.1adb.cdca
+C9800-WLC#
+DEBUG:netmiko:read_channel: 
+DEBUG:netmiko:read_channel: 
+DEBUG:netmiko:^@
+C9800-WLC#ap name AP78BC.1ADB.CB1C name ap.black.pearl.conf1
+C9800-WLC#ap name AP78BC.1ADB.CDCA name ap.flying.dutchman.lobby2
+C9800-WLC#show ap config general | include ^Cisco AP Name|^MAC Address
+Cisco AP Name   : ap.black.pearl.conf1
+MAC Address                                     : 78bc.1adb.cb1c
+Cisco AP Name   : ap.flying.dutchman.lobby2
+MAC Address                                     : 78bc.1adb.cdca
+C9800-WLC#
+DEBUG:netmiko:write_channel: b'\n'
+DEBUG:netmiko:read_channel: 
+C9800-WLC#
+DEBUG:netmiko:read_channel: 
+DEBUG:netmiko:read_channel: 
+DEBUG:netmiko:write_channel: b'exit\n'
+DEBUG:paramiko.transport:EOF in transport thread

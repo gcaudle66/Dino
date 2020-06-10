@@ -255,50 +255,107 @@ def test_get_dnac_token():
     import time
     import requests
     global dnac_connArgs
-    print("\n\n\n")
-    print("*********************************************************")
-    print("*     TEST FUNCTION CALLED** USED ONLY WHEN TESTING     *")
-    print("*        DETECTED LOOPBACK IP AND TEST API PORT         *")
-    print("*********************************************************")
-    print("* Dino | Cisco DNA Center REST API Connex               *");
-    print("*                                                       *");
-    print("* -Connection info confirmed by user.                   *");
-    print("*                                                       *");
-    print("* Script will now connect to the LOCAL TEST API SERVER  *");
-    print("* interface and retreive the TEST Authentication Token  *");
-    print("*                                                       *");
-    print("*    Press [Enter] to Continue or Control-C to exit     *");
-    print("*********************************************************");
-    print("\n\n")
-    choice = input("")
-    print("*********************************************************")
-    print("***TEST FUNCTION CALLED** USED ONLY WHEN TESTING        *")
-    print("*********************************************************")
-    try:
-        token = requests.post(
-        "https://" + dino.dnac_connArgs["cluster"] + "/dna/system/api/v1/auth/token",
-        auth=HTTPBasicAuth(
-           username = dino.dnac_connArgs["username"],
-           password = dino.dnac_connArgs["password"]
-        ),
-        headers={'content-type': 'application/json'},
-        verify=False,
-        )
-    except requests.exceptions.ConnectionError:
-        print("Some error occured, likely a timeout")
-    else:
-        data = token.json()
-        dnac_token = data[1]["Token"]
-        print("\n" \
-              "        ##                                                \n" \
-              "       ##  Cha-Ching!                                     \n" \
-              "      ##     We got the TEST Token!                            \n" \
-              " ##  ##                                                   \n" \
-              "  ####                                                    \n" \
-              "   ##  TEST FUNCTION CALLED** USED ONLY WHEN TESTING      \n" \
-              "                                                            ")
-        print(dnac_token)
-        return dino.api_main2() #dnac_token
+    while True:
+        print("\n\n\n")
+        print("*********************************************************")
+        print("*     TEST FUNCTION CALLED** USED ONLY WHEN TESTING     *")
+        print("*        DETECTED LOOPBACK IP AND TEST API PORT         *")
+        print("*********************************************************")
+        print("* Dino | Cisco DNA Center REST API Connex               *");
+        print("*                                                       *");
+        print("* -Connection info confirmed by user.                   *");
+        print("*                                                       *");
+        print("* Script will now connect to the LOCAL TEST API SERVER  *");
+        print("* interface and retreive the TEST Authentication Token  *");
+        print("*                                                       *");
+        print("*    Press [Enter] to Continue or Control-C to exit     *");
+        print("*********************************************************");
+        print("\n\n")
+        choice = input("")
+        print("*********************************************************")
+        print("***TEST FUNCTION CALLED** USED ONLY WHEN TESTING        *")
+        print("*********************************************************")
+        try:
+            token = requests.post(
+            "https://" + dino.dnac_connArgs["cluster"] + "/dna/system/api/v1/auth/token",
+            auth=HTTPBasicAuth(
+               username = dino.dnac_connArgs["username"],
+               password = dino.dnac_connArgs["password"]
+            ),
+            headers={'content-type': 'application/json'},
+            verify=False,
+            )
+        except ValueError as verr:
+            #logging.debug("Exception occured as: " + str(verr))
+            print("\n\n")
+            print("*********************************************************");
+            print("* Dino | ConneX ERROR                                   *");
+            print("*********************************************************");
+            print(f" ERROR                                  \n" \
+                  " E                                      \n" \
+                  " ERROR : Value entered is not valid,\n" \
+                  " E           therefore it is invalid!  \n" \
+                  " ERROR                                  \n" \
+                  "Expecting Value of Type: {} | Please Try Again \n" \
+                  "Error Details: {}\n\n".format(type(choice), verr))
+            cont = input("--> Press [Enter] to Continue or Ctrl-C to quit   \n")
+            continue
+        except KeyError as kerr:
+            #logging.debug("Exception occured as: " + str(verr))
+            print("\n\n")
+            print("*********************************************************");
+            print("* Dino | ConneX ERROR                                   *");
+            print("*********************************************************");
+            print(f" ERROR                                  \n" \
+                  " E                                      \n" \
+                  " ERROR : Key Error has occured\n" \
+                  " E           Unrecoverable Error!  \n" \
+                  " ERROR                                  \n" \
+                  "\n" \
+                  "Error Details: {}\n\n".format(kerr))
+            cont = input("--> Press [Enter] to Continue or Ctrl-C to quit   \n")
+            continue
+        except Exception as exc:
+            #logging.debug("Exception occured as: " + str(exc))
+            print("\n\n")
+            print("*********************************************************");
+            print("* Dino | ConneX ERROR                                   *");
+            print("*********************************************************");
+            print(f" ERROR                                  \n" \
+                  " E                                      \n" \
+                  " ERROR : An Exception was Thrown!\n" \
+                  " E           (which is bad)  \n" \
+                  " ERROR                                  \n" \
+                  "Arguments Entered: [{}] Please Try Again \n" \
+                  "Error Details: {}\n\n".format(exc.args, exc))
+            cont = input("--> Press [Enter] to Continue or Ctrl-C to quit   \n")
+            continue
+        except requests.exceptions.InvalidURL:
+            print("*********************************************************");
+            print("* Dino | ConneX ERROR                                   *");
+            print("*********************************************************");
+            print("*                                                       *");
+            print("* Houston, we have a problem!                           *");
+            print("* The URL/IP provided below is invalid. Please re-enter it.*");                        
+            print("*********************************************************")
+            print(dnac_connArgs.get("cluster"))
+            time.sleep(3)
+            dnac_connArgs["cluster"] = input("* DNA-C Hostname/IP : ")
+            continue
+        else:
+            data = token.json()
+            dnac_token = data[1]["Token"]
+            print("\n" \
+                  "        ##                                                \n" \
+                  "       ##  Cha-Ching!                                     \n" \
+                  "      ##     We got the TEST Token!                            \n" \
+                  " ##  ##                                                   \n" \
+                  "  ####                                                    \n" \
+                  "   ##  TEST FUNCTION CALLED** USED ONLY WHEN TESTING      \n" \
+                  "                                                            ")
+            print(dnac_token)
+            dino.api_main2()
+            break
 
 def test_get_dnac_inventory():
     import json
@@ -326,6 +383,74 @@ def test_get_dnac_inventory():
         return dnac_inventory
 
 
+
+
+### DNAC API JSON BODYs for Calls to Modify/PUT Data
+
+dnac_AddDevice = {
+    "cliTransport": "string",
+    "computeDevice": "boolean",
+    "enablePassword": "string",
+    "extendedDiscoveryInfo": "string",
+    "httpPassword": "string",
+    "httpPort": "string",
+    "httpSecure": "boolean",
+    "httpUserName": "string",
+    "ipAddress": [
+        "string"
+    ],
+    "merakiOrgId": [
+        "string"
+    ],
+    "netconfPort": "string",
+    "password": "string",
+    "serialNumber": "string",
+    "snmpAuthPassphrase": "string",
+    "snmpAuthProtocol": "string",
+    "snmpMode": "string",
+    "snmpPrivPassphrase": "string",
+    "snmpPrivProtocol": "string",
+    "snmpROCommunity": "string",
+    "snmpRWCommunity": "string",
+    "snmpRetry": "integer",
+    "snmpTimeout": "integer",
+    "snmpUserName": "string",
+    "snmpVersion": "string",
+    "type": "string",
+    "updateMgmtIPaddressList": [
+        {
+            "existMgmtIpAddress": "string",
+            "newMgmtIpAddress": "string"
+        }
+    ],
+    "userName": "string"}
+
+dnac_AddSite = {
+    "type": "area",
+    "site": {
+        "area": {
+            "name": "string",
+            "parentName": "string"
+        },
+        "building": {
+            "name": "string",
+            "address": "string",
+            "parentName": "string",
+            "latitude": "number",
+            "longitude": "number"
+        },
+        "floor": {
+            "name": "string",
+            "parentName": "string",
+            "rfModel": "string",
+            "width": "number",
+            "length": "number",
+            "height": "number"
+        }
+    }
+}
+
+    
 ### END TESTING FUNCTIONS SECTION
 
 ##if __name__ == "__main__":
