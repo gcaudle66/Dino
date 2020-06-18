@@ -1,0 +1,361 @@
+{
+    "status": true,
+    "response": [
+        {
+            "parentId": "25936ff2-2f8b-4f21-8add-4ce20a4e42cf",
+            "systemGroup": false,
+            "groupTypeList": [
+                "SITE"
+            ],
+            "additionalInfo": [
+                {
+                    "nameSpace": "Location",
+                    "attributes": {
+                        "addressInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db",
+                        "type": "area"
+                    }
+                },
+                {
+                    "nameSpace": "com.wireless.managingwlc",
+                    "attributes": {
+                        "secondaryWlcInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db",
+                        "anchorWlcInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db",
+                        "tertiaryWlcInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db",
+                        "primaryWlcInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db"
+                    }
+                },
+                {
+                    "nameSpace": "System Settings",
+                    "attributes": {
+                        "group.count.total": "5",
+                        "hasChild": "TRUE",
+                        "group.count.direct": "2",
+                        "group.hierarchy.groupType": "SITE",
+                        "member.count.total": "0",
+                        "member.count.direct": "0"
+                    }
+                }
+            ],
+            "groupHierarchy": "25936ff2-2f8b-4f21-8add-4ce20a4e42cf/1da99efb-4390-47c5-baa5-f1a54807c4db",
+            "groupNameHierarchy": "Global/United States",
+            "name": "United States",
+            "instanceTenantId": "5d8d2b5927a4ee004328f51d",
+            "id": "1da99efb-4390-47c5-baa5-f1a54807c4db"
+        },
+        {
+            "parentId": "1da99efb-4390-47c5-baa5-f1a54807c4db",
+            "systemGroup": false,
+            "groupTypeList": [
+                "SITE"
+            ],
+            "additionalInfo": [
+                {
+                    "nameSpace": "System Settings",
+                    "attributes": {
+                        "group.count.total": "3",
+                        "hasChild": "TRUE",
+                        "group.count.direct": "1",
+                        "group.hierarchy.groupType": "SITE",
+                        "member.count.total": "0",
+                        "member.count.direct": "0"
+                    }
+                },
+                {
+                    "nameSpace": "Location",
+                    "attributes": {
+                        "addressInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db",
+                        "type": "area"
+                    }
+                },
+                {
+                    "nameSpace": "com.wireless.managingwlc",
+                    "attributes": {
+                        "secondaryWlcInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db",
+                        "anchorWlcInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db",
+                        "tertiaryWlcInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db",
+                        "primaryWlcInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db"
+                    }
+                }
+            ],
+            "groupHierarchy": "25936ff2-2f8b-4f21-8add-4ce20a4e42cf/1da99efb-4390-47c5-baa5-f1a54807c4db/ad7597d9-ee2f-491f-839c-a6c2bc87a150",
+            "groupNameHierarchy": "Global/United States/North Carolina",
+            "name": "North Carolina",
+            "instanceTenantId": "5d8d2b5927a4ee004328f51d",
+            "id": "ad7597d9-ee2f-491f-839c-a6c2bc87a150"
+        },
+        {
+            "parentId": "ad7597d9-ee2f-491f-839c-a6c2bc87a150",
+            "systemGroup": false,
+            "groupTypeList": [
+                "SITE"
+            ],
+            "additionalInfo": [
+                {
+                    "nameSpace": "Location",
+                    "attributes": {
+                        "addressInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db",
+                        "type": "area"
+                    }
+                },
+                {
+                    "nameSpace": "System Settings",
+                    "attributes": {
+                        "group.count.total": "2",
+                        "hasChild": "TRUE",
+                        "group.count.direct": "1",
+                        "group.hierarchy.groupType": "SITE",
+                        "member.count.total": "0",
+                        "member.count.direct": "0"
+                    }
+                },
+                {
+                    "nameSpace": "com.wireless.managingwlc",
+                    "attributes": {
+                        "secondaryWlcInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db",
+                        "anchorWlcInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db",
+                        "tertiaryWlcInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db",
+                        "primaryWlcInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db"
+                    }
+                }
+            ],
+            "groupHierarchy": "25936ff2-2f8b-4f21-8add-4ce20a4e42cf/1da99efb-4390-47c5-baa5-f1a54807c4db/ad7597d9-ee2f-491f-839c-a6c2bc87a150/c2ce39e9-acf5-4877-959e-717e6e71034b",
+            "groupNameHierarchy": "Global/United States/North Carolina/RTP",
+            "name": "RTP",
+            "instanceTenantId": "5d8d2b5927a4ee004328f51d",
+            "id": "c2ce39e9-acf5-4877-959e-717e6e71034b"
+        },
+        {
+            "parentId": "06946e90-8058-400f-82d8-d36ae267e956",
+            "systemGroup": false,
+            "groupTypeList": [
+                "SITE"
+            ],
+            "additionalInfo": [
+                {
+                    "nameSpace": "Location",
+                    "attributes": {
+                        "address": "Rtp, Morrisville, North Carolina 27560, United States",
+                        "addressInheritedFrom": "06946e90-8058-400f-82d8-d36ae267e956",
+                        "type": "floor"
+                    }
+                },
+                {
+                    "nameSpace": "mapsSummary",
+                    "attributes": {
+                        "rfModel": "39039",
+                        "locationGroup": "",
+                        "floorIndex": "1"
+                    }
+                },
+                {
+                    "nameSpace": "com.wireless.managingwlc",
+                    "attributes": {
+                        "secondaryWlcInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db",
+                        "anchorWlcInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db",
+                        "tertiaryWlcInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db",
+                        "primaryWlcInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db"
+                    }
+                },
+                {
+                    "nameSpace": "System Settings",
+                    "attributes": {
+                        "group.count.total": "0",
+                        "hasChild": "FALSE",
+                        "group.count.direct": "0",
+                        "group.hierarchy.groupType": "SITE",
+                        "member.count.total": "0",
+                        "member.count.direct": "0"
+                    }
+                },
+                {
+                    "nameSpace": "mapGeometry",
+                    "attributes": {
+                        "offsetX": "0.0",
+                        "offsetY": "0.0",
+                        "length": "56.0",
+                        "width": "100.0",
+                        "geometryType": "DUMMYTYPE",
+                        "height": "10.0"
+                    }
+                }
+            ],
+            "groupHierarchy": "25936ff2-2f8b-4f21-8add-4ce20a4e42cf/1da99efb-4390-47c5-baa5-f1a54807c4db/ad7597d9-ee2f-491f-839c-a6c2bc87a150/c2ce39e9-acf5-4877-959e-717e6e71034b/06946e90-8058-400f-82d8-d36ae267e956/a05db3d2-e7c6-4fd6-8838-d11a0cbb09a9",
+            "groupNameHierarchy": "Global/United States/North Carolina/RTP/Site1/Floor2",
+            "name": "Floor2",
+            "instanceTenantId": "5d8d2b5927a4ee004328f51d",
+            "id": "a05db3d2-e7c6-4fd6-8838-d11a0cbb09a9"
+        },
+        {
+            "parentId": "c2ce39e9-acf5-4877-959e-717e6e71034b",
+            "systemGroup": false,
+            "groupTypeList": [
+                "SITE"
+            ],
+            "additionalInfo": [
+                {
+                    "nameSpace": "com.wireless.managingwlc",
+                    "attributes": {
+                        "secondaryWlcInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db",
+                        "anchorWlcInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db",
+                        "tertiaryWlcInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db",
+                        "primaryWlcInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db"
+                    }
+                },
+                {
+                    "nameSpace": "System Settings",
+                    "attributes": {
+                        "group.count.total": "1",
+                        "hasChild": "TRUE",
+                        "group.count.direct": "1",
+                        "group.hierarchy.groupType": "SITE",
+                        "member.count.total": "0",
+                        "member.count.direct": "0"
+                    }
+                },
+                {
+                    "nameSpace": "Location",
+                    "attributes": {
+                        "country": "United States",
+                        "address": "Rtp, Morrisville, North Carolina 27560, United States",
+                        "latitude": "35.866357",
+                        "addressInheritedFrom": "06946e90-8058-400f-82d8-d36ae267e956",
+                        "type": "building",
+                        "longitude": "-78.880283"
+                    }
+                }
+            ],
+            "groupHierarchy": "25936ff2-2f8b-4f21-8add-4ce20a4e42cf/1da99efb-4390-47c5-baa5-f1a54807c4db/ad7597d9-ee2f-491f-839c-a6c2bc87a150/c2ce39e9-acf5-4877-959e-717e6e71034b/06946e90-8058-400f-82d8-d36ae267e956",
+            "groupNameHierarchy": "Global/United States/North Carolina/RTP/Site1",
+            "name": "Site1",
+            "instanceTenantId": "5d8d2b5927a4ee004328f51d",
+            "id": "06946e90-8058-400f-82d8-d36ae267e956"
+        },
+        {
+            "parentId": "1da99efb-4390-47c5-baa5-f1a54807c4db",
+            "systemGroup": false,
+            "groupTypeList": [
+                "SITE"
+            ],
+            "additionalInfo": [
+                {
+                    "nameSpace": "Location",
+                    "attributes": {
+                        "addressInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db",
+                        "type": "area"
+                    }
+                },
+                {
+                    "nameSpace": "com.wireless.managingwlc",
+                    "attributes": {
+                        "secondaryWlcInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db",
+                        "anchorWlcInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db",
+                        "tertiaryWlcInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db",
+                        "primaryWlcInheritedFrom": "1da99efb-4390-47c5-baa5-f1a54807c4db"
+                    }
+                },
+                {
+                    "nameSpace": "System Settings",
+                    "attributes": {
+                        "group.count.total": "0",
+                        "hasChild": "FALSE",
+                        "group.count.direct": "0",
+                        "group.hierarchy.groupType": "SITE",
+                        "member.count.total": "0",
+                        "member.count.direct": "0"
+                    }
+                }
+            ],
+            "groupHierarchy": "25936ff2-2f8b-4f21-8add-4ce20a4e42cf/1da99efb-4390-47c5-baa5-f1a54807c4db/8f5ae5ca-d964-4b6d-af2f-ed94f9a8335f",
+            "groupNameHierarchy": "Global/United States/Texas",
+            "name": "Texas",
+            "instanceTenantId": "5d8d2b5927a4ee004328f51d",
+            "id": "8f5ae5ca-d964-4b6d-af2f-ed94f9a8335f"
+        },
+        {
+            "parentId": "25936ff2-2f8b-4f21-8add-4ce20a4e42cf",
+            "systemGroup": false,
+            "groupTypeList": [
+                "SITE"
+            ],
+            "additionalInfo": [
+                {
+                    "nameSpace": "System Settings",
+                    "attributes": {
+                        "group.count.total": "1",
+                        "hasChild": "TRUE",
+                        "group.count.direct": "1",
+                        "group.hierarchy.groupType": "SITE",
+                        "member.count.total": "0",
+                        "member.count.direct": "0"
+                    }
+                },
+                {
+                    "nameSpace": "com.wireless.managingwlc",
+                    "attributes": {
+                        "secondaryWlcInheritedFrom": "8af5dd47-6118-423d-ae73-31b3a5ac9bf8",
+                        "anchorWlcInheritedFrom": "8af5dd47-6118-423d-ae73-31b3a5ac9bf8",
+                        "tertiaryWlcInheritedFrom": "8af5dd47-6118-423d-ae73-31b3a5ac9bf8",
+                        "primaryWlcInheritedFrom": "8af5dd47-6118-423d-ae73-31b3a5ac9bf8"
+                    }
+                },
+                {
+                    "nameSpace": "Location",
+                    "attributes": {
+                        "addressInheritedFrom": "8af5dd47-6118-423d-ae73-31b3a5ac9bf8",
+                        "type": "area"
+                    }
+                }
+            ],
+            "groupHierarchy": "25936ff2-2f8b-4f21-8add-4ce20a4e42cf/8af5dd47-6118-423d-ae73-31b3a5ac9bf8",
+            "groupNameHierarchy": "Global/Dallas",
+            "name": "Dallas",
+            "instanceTenantId": "5d8d2b5927a4ee004328f51d",
+            "id": "8af5dd47-6118-423d-ae73-31b3a5ac9bf8"
+        },
+        {
+            "parentId": "8af5dd47-6118-423d-ae73-31b3a5ac9bf8",
+            "systemGroup": false,
+            "groupTypeList": [
+                "SITE"
+            ],
+            "additionalInfo": [
+                {
+                    "nameSpace": "System Settings",
+                    "attributes": {
+                        "group.count.total": "0",
+                        "hasChild": "FALSE",
+                        "group.count.direct": "0",
+                        "group.hierarchy.groupType": "SITE",
+                        "member.count.total": "0",
+                        "member.count.direct": "0"
+                    }
+                },
+                {
+                    "nameSpace": "Location",
+                    "attributes": {
+                        "country": "United States",
+                        "address": "111 Main Rd",
+                        "latitude": "32",
+                        "addressInheritedFrom": "3bb7ebbb-e1a5-44f8-8a3b-6253d4672268",
+                        "type": "building",
+                        "longitude": "-96"
+                    }
+                },
+                {
+                    "nameSpace": "com.wireless.managingwlc",
+                    "attributes": {
+                        "secondaryWlcInheritedFrom": "8af5dd47-6118-423d-ae73-31b3a5ac9bf8",
+                        "anchorWlcInheritedFrom": "8af5dd47-6118-423d-ae73-31b3a5ac9bf8",
+                        "tertiaryWlcInheritedFrom": "8af5dd47-6118-423d-ae73-31b3a5ac9bf8",
+                        "primaryWlcInheritedFrom": "8af5dd47-6118-423d-ae73-31b3a5ac9bf8"
+                    }
+                }
+            ],
+            "groupHierarchy": "25936ff2-2f8b-4f21-8add-4ce20a4e42cf/8af5dd47-6118-423d-ae73-31b3a5ac9bf8/3bb7ebbb-e1a5-44f8-8a3b-6253d4672268",
+            "groupNameHierarchy": "Global/Dallas/Corp HQ",
+            "name": "Corp HQ",
+            "instanceTenantId": "5d8d2b5927a4ee004328f51d",
+            "id": "3bb7ebbb-e1a5-44f8-8a3b-6253d4672268"
+        }
+    ]
+}

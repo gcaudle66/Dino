@@ -9,7 +9,7 @@ global dnac_token
 global local_dnac_connArgs
 global dnac_token_lifetime
 global dnac_token_expired
-##global dnac_savedCreds
+global dnac_site_list
 global dnac_inventory
 #global wifi_inv
 global recent_urls
@@ -17,45 +17,14 @@ global json_data
 
 local_dnac_connArgs = {}
 dnac_token_expired = True
-#dnac_savedCreds = False
 debug_status = False
-
+dnac_site_list = {}
 json_data = []
 
 
 ## Common DNAC API URLs to call in functioons
 
-##def get_dnac_token():
-##    import dino
-##    global dnac_token
-##    global json_data
-##    json_data = []
-##    try:
-##        token = requests.post(
-##        "https://" + dino.dnac_connArgs["cluster"] + "/dna/system/api/v1/auth/token",
-##        auth=HTTPBasicAuth(
-##           username = dino.dnac_connArgs["username"],
-##           password = dino.dnac_connArgs["password"]
-##        ),
-##        headers={'content-type': 'application/json'},
-##        verify=False,
-##        )
-##    except requests.exceptions.ConnectionError:
-##        print("Some error occured, likely a timeout")
-##    else:
-##        data = token.json()
-##        json_data.append(data)
-##        dnac_token = data["Token"]
-##        print("\n" \
-##              "        ##                                                \n" \
-##              "       ##  Cha-Ching!                                     \n" \
-##              "      ##     We got the Token!                            \n" \
-##              " ##  ##                                                   \n" \
-##              "  ####                                                    \n" \
-##              "   ##                  ...API Auth-Token that is          \n" \
-##              "                                                            ")
-##        return dnac_token
-        
+
 def get_dnac_token(dnac_connArgs):
     global dnac_token
     global local_dnac_connArgs
@@ -72,21 +41,54 @@ def get_dnac_token(dnac_connArgs):
         headers={'content-type': 'application/json'},
         verify=False,
         )
-    except requests.exceptions.ConnectionError:
-        print("Some error occured, likely a timeout")
+    except requests.exceptions.ConnectionError as exc:
+        print("*********************************************************");
+        print("* Dino | Cisco DNA Center REST API Connex               *");
+        print("*********************************************************");
+        print("*                                                       *");
+        print("* Big E...little e, what begins with E??                *");
+        print("* ERROR! Received the below error when attempting the   *");
+        print("* connection to DNA Center. Dropping back to resolve... *");
+        print("*********************************************************");
+        print(exc)
+        dino.dnac_savedCreds = False
+        cont = input("Press [Enter] to try again or Ctrl-C to quit")
+        dino.api_main()
     else:
-        data = token.json()
-        json_data.append(data)
-        dnac_token = data["Token"]
-        print("\n" \
-              "        ##                                                \n" \
-              "       ##  Cha-Ching!                                     \n" \
-              "      ##     We got the Token!                            \n" \
-              " ##  ##                                                   \n" \
-              "  ####                                                    \n" \
-              "   ##                  ...API Auth-Token that is          \n" \
-              "                                                            ")
-        return dnac_token
+        response_code = token.status_code
+        print(f"Status Code: {token.status_code}")
+        if response_code == 200:
+            data = token.json()
+            json_data.append(data)
+            dnac_token = data["Token"]
+            print("\n" \
+                  "        ##                                                \n" \
+                  "       ##  Cha-Ching!                                     \n" \
+                  "      ##     We got the Token!                            \n" \
+                  " ##  ##                                                   \n" \
+                  "  ####                                                    \n" \
+                  "   ##                  ...API Auth-Token that is          \n" \
+                  "                                                            ")
+            return dnac_token
+        elif response_code == 401:
+            print("*********************************************************");
+            print("* Dino | Cisco DNA Center REST API Connex               *");
+            print("*********************************************************");
+            print("*                                                       *");
+            print("* Big E...little e, what begins with E?? ERROR!         *");
+            print("* Received 401 Unauthorized when attempting the         *");
+            print("* connection to DNA Center. Dropping back to resolve... *");
+            print("*********************************************************");
+            print("\n")
+            dino.dnac_savedCreds = False
+            cont = input("Press [Enter] to try again or Ctrl-C to quit")
+            dino.api_main()
+        else:
+            print("Failed to retreive token.")
+            return response_code
+
+
+
 
 def get_device_WifiInfo(dnac_token, ap_uuid):
     import json
@@ -114,18 +116,72 @@ def get_dnac_inventory():
         'X-Auth-Token': dnac_token
         }
     response = requests.request("GET", url, headers=headers, data = payload, files = files, verify=False)
-    data = response.text.encode('utf8')
-    json_data = json.loads(data)
-    try:
-        dnac_inventory = json_data["response"]
-    except KeyError:
-        print("*********************************************************\n" \
-              "* Received an error in response. Possible expired DNAC  *\n" \
-              "* token. DEBUG can be enabled to troubleshoot.          *\n" \
-              "* DEBUG is Enabled : " + str(debug_status) + "               *\n" \
-              "*********************************************************\n") 
+    response_code = response.status_code
+    print(f"Status Code: {response.status_code}")
+    if response_code == 200:
+        data = response.text.encode('utf8')
+        json_data = json.loads(data)
+        try:
+            dnac_inventory = json_data["response"]
+        except KeyError:
+            print("*********************************************************\n" \
+                  "* Received an error in response. Possible expired DNAC  *\n" \
+                  "* token. DEBUG can be enabled to troubleshoot.          *\n" \
+                  "* DEBUG is Enabled : " + str(debug_status) + "               *\n" \
+                  "*********************************************************\n") 
+        else:
+            return dnac_inventory
+    elif response_code == 401:
+        print("*********************************************************");
+        print("* Dino | Cisco DNA Center REST API Connex               *");
+        print("*********************************************************");
+        print("*                                                       *");
+        print("* Big E...little e, what begins with E?? ERROR!         *");
+        print("* Received 401 Unauthorized when attempting the         *");
+        print("* connection to DNA Center. Dropping back to resolve... *");
+        print("*********************************************************");
+        print("\n")
+        dino.dnac_savedCreds = False
+        cont = input("Press [Enter] to try again or Ctrl-C to quit")
+        dino.api_main()
     else:
-        return dnac_inventory
+        print("*********************************************************");
+        print("* Dino | Cisco DNA Center REST API Connex               *");
+        print("*********************************************************");
+        print("*                                                       *");
+        print("*            Houston, we have a problem!                *");
+        print("* Dino failed to retreive the inventory as expected     *");
+        print("* from DNA Center. Response details below.              *");
+        print("*********************************************************");
+        print("\n")
+        dino.dnac_savedCreds = False
+        cont = input("Press [Enter] to try again or Ctrl-C to quit")
+        print(response)
+        print(response.status_code)
+        dino.api_main()
+        
+def iterate_dnac_inventory():
+    global dnac_inventory
+    exit = False
+    entries = len(dnac_inventory)
+    print("Total Number of Items in inventory : {}".format(entries))
+    cont = input("Press [Enter] to continue or X to exit.")
+    if cont == "X":
+        done = "done"
+        return done
+    entry_num = 0
+    for x in range(len(dnac_inventory)):
+        item = dnac_inventory[x]
+        print("Entry {} : \n {}".format(entry_num, item))
+        print("---------------------")
+        next = input("---Press [Enter] for next entry or type \"x\" [Enter] to Exit---")
+        if next == "x":
+            dino.api_main_menu()
+            break
+        entry_num = entry_num + 1
+    done = input("*** End of Inventory. Press [Enter] to exit *******")
+    return done
+
 
 
 def gather_inv_devices():
@@ -254,11 +310,222 @@ def locate_wlcs(dnac_token, dnac_inventory):
           "Registered in DNA Center                     \n")
     return wlc_inv
 
+
+def get_base(*args):
+    """ This function is calling the API at the level """
+    """    https://<cluster-ip>/dna/intent/api/v1/    """
+    """ ...pass args to this to go to desired level   """
+    global dnac_token
+    global root_url
+    global get_result
+    response = requests.get(
+        "https://{}/dna/intent/api/v1".format(local_dnac_connArgs["cluster"]) + str(*args),
+    headers={
+        "X-Auth-Token": "{}".format(dnac_token),
+        "Content-type": "application/json",
+    },
+    verify=False
+    )
+    res_code = response
+    res_json = response.json()
+    print(response.status_code)
+    response_code = response.status_code
+    get_result = res_json()
+    return get_result, response, response_code
+
+
+def get_site():
+    import json
+    global dnac_token
+    global root_url
+    global get_result_site
+    global dnac_site_list
+    site_url = "/site"
+    response = requests.get(
+        "https://{}/dna/intent/api/v1/site".format(local_dnac_connArgs["cluster"]) + site_url,
+    headers={
+        "X-Auth-Token": "{}".format(dnac_token),
+        "Content-type": "application/json",
+    },
+    verify=False
+    )
+    res_json = response.json()
+    print(response.status_code)
+    response_code = response.status_code
+    get_result_site = res_json
+    dnac_site_list = res_json
+    return dnac_site_list
+
+
+def full_site_inv(get_result_site):
+    """ This functions pulls sites and devices via """
+    """ the below api call from the "Global" site  """
+    """ so all sites and devices are captured      """
+    """ /dna/intent/api/v1/membership/{siteId}     """
+    """ g_siteId <--is the global site-id          """
+    """      return get results and g_siteId       """
+    """      in order to pull inventory from it    """
+    """                                            """
+    global get_result
+    siteIds = {}
+    membershipApi = "/membership/"
+    g_siteId = ""
+##  Loop through and find same values and add to dictionary as key:values
+    for x in range(len(get_result_site)):
+        sname = get_result_site[x]['name']
+        sid = get_result_site[x]['id']
+        siteIds[sname] = sid
+    g_siteId = siteIds.get('Global', 'Error: Value not found')
+    if 'Error' in g_siteId:
+        print('Global site id not found. Exiting...')
+        raise ValueError
+    else:
+        print("Global site id found: " + g_siteId + "..continuing")
+        apiUrl = (f"/membership/{g_siteId}")
+        siteInv = get_base(apiUrl)
+        print(siteInv)
+    return siteInv              
+
+
+
+def post_intent_base(jsonBody, path, headers):
+    """ This function is calling the API at the level """
+    """    https://<cluster-ip>/dna/intent/api/v1/    """
+    """ ...pass args to this to go to desired level   """
+    global dnac_token
+    global root_url
+    global post_result
+    payload = jsonBody
+    while True:
+        try:
+            response = requests.post(
+            "https://{}/dna/intent/api/v1".format(local_dnac_connArgs["cluster"]) + str(path),
+            data=payload,
+            headers = headers,
+            verify=False
+            )
+        except requests.exceptions.HTTPError as httperr:
+            print(httperr)
+        else:
+            res_code = response.status_code
+            res_json = response.json()
+            #requests.Response.raise_for_status(response)
+            post_result = ["Response Code: " + str(res_code), res_json]
+            print(post_result)
+            return post_result, dino.api_main_menu()
+
+
+#def start_discovery(discoName):
+    
+
+
+def add_device(devName):
+    """ Add a device via API. For loop required fields first
+    the the rest are optional.
+    """
+    import json
+    headers = {
+        "X-Auth-Token": "{}".format(dnac_token),
+        "Content-type": "application/json"
+        }
+    api_path = "/network-device"
+    newDevReq = {
+        "cliTransport": "string",
+        "enablePassword": "string",
+        "ipAddress": [
+            "string"
+            ],
+        "password": "string",
+        "snmpAuthPassphrase": "string",
+        "snmpAuthProtocol": "string",
+        "snmpMode": "string",
+        "snmpPrivPassphrase": "string",
+        "snmpPrivProtocol": "string",
+        "snmpROCommunity": "string",
+        "snmpRWCommunity": "string",
+        "snmpRetry": "integer",
+        "snmpTimeout": "integer",
+        "snmpUserName": "string",
+        "userName": "string"
+        }
+    for x in newDevReq:
+        inputType = newDevReq[x]
+        newDevReq[x] = input("Please enter value for  \"{}\" as a {} : ".format(x, inputType))
+    devName = json.dumps(newDevReq)
+    print(devName)
+    return post_intent_base(devName, api_path, headers)
+
+
+def add_site():
+    """
+    root    (map, required)
+    type    (string, required, enum: area, building, floor)
+    site    (map, required)
+    area    (map, optional)
+    name    (string, required)
+    parentName    (string, required)
+    building    (map, optional)
+    name    (string, required)
+    address    (string, optional)
+    parentName    (string, required)
+    latitude    (number, required)
+    longitude    (number, required)
+    floor    (map, optional)
+    name    (string, required)
+    parentName    (string, required)
+    rfModel    (string, required, enum: Cubes And Walled Offices, Drywall Office Only, Indoor High Ceiling, Outdoor Open Space)
+    width    (number, required)
+    length    (number, required)
+    height    (number, required)
+    """
+    api_path = "/site"
+    headers = {
+        "X-Auth-Token": "{}".format(dnac_token),
+        "Content-type": "application/json",
+        "__runsync": "true",
+        "__runsynctimeout": "30",
+        "__persistbapioutput": "true"
+        }
+    newSiteType = {
+    "type": "Type of site (Only 1 can be done at a time): area, building, floor"}
+    newSiteConstruct = {
+        "site": {
+            "area": {
+            "name": "string, required",
+            "parentName": "string, required"
+        },
+        "building": {
+            "name": "string, required",
+            "address": "string, optional",
+            "parentName": "string, required",
+            "latitude": "number, required",
+            "longitude": "number, required"
+        },
+        "floor": {
+            "name": "string, required",
+            "parentName": "string, required",
+            "rfModel": "string, required, enum: Cubes And Walled Offices, Drywall Office Only, Indoor High Ceiling, Outdoor Open Space",
+            "width": "number, required",
+            "length": "number, required",
+            "height": "number, required"}
+        }}
+    newSiteType["type"] = input("Please enter value for  \"{}\" : ".format(newSiteType["type"]))
+    for x in newSiteConstruct[newSiteType]:
+        inputType = newSiteType[x]
+        newSiteType[x] = input("Please enter value for  \"{}\" as a {} : ".format(x, inputType))
+    newSite = {
+        newSiteType}
+    addSite = json.dumps(newSite)
+    print(devName)
+    return post_intent_base(addSite, api_path, headers)
+
+    
+
 def enable_req_debug():
     global debug_status
     import logging
     import http.client as http_client
-    http_client.HTTPConnection.debuglevel = 1
+    http_client.HTTPConnectionjson.debuglevel = 1
     httpclient_logger = logging.getLogger("http.client")
     def httpclient_logging_patch(level=logging.DEBUG):
         """Enable HTTPConnection debug logging to the logging framework"""
@@ -419,6 +686,31 @@ def test_get_dnac_inventory():
 
 ### DNAC API JSON BODYs for Calls to Modify/PUT Data
 
+dnac_addSite = {
+    "type": "string",
+    "site": {
+        "area": {
+            "name": "string",
+            "parentName": "string"
+        },
+        "building": {
+            "name": "string",
+            "address": "string",
+            "parentName": "string",
+            "latitude": "number",
+            "longitude": "number"
+        },
+        "floor": {
+            "name": "string",
+            "parentName": "string",
+            "rfModel": "string",
+            "width": "number",
+            "length": "number",
+            "height": "number"
+        }
+    }
+}
+
 dnac_AddDevice = {
     "cliTransport": "string",
     "computeDevice": "boolean",
@@ -480,6 +772,74 @@ dnac_AddSite = {
             "height": "number"
         }
     }
+}
+
+
+dnac_startDiscovery = {
+  "cdpLevel": 0,
+  "discoveryType": "string",
+  "enablePasswordList": [
+    "string"
+  ],
+  "globalCredentialIdList": [
+    "string"
+  ],
+  "httpReadCredential": {
+    "comments": "string",
+    "credentialType": "GLOBAL",
+    "description": "string",
+    "id": "string",
+    "instanceTenantId": "string",
+    "instanceUuid": "string",
+    "password": "string",
+    "port": 0,
+    "secure": True,
+    "username": "string"
+  },
+  "httpWriteCredential": {
+    "comments": "string",
+    "credentialType": "GLOBAL",
+    "description": "string",
+    "id": "string",
+    "instanceTenantId": "string",
+    "instanceUuid": "string",
+    "password": "string",
+    "port": 0,
+    "secure": True,
+    "username": "string"
+  },
+  "ipAddressList": "string",
+  "ipFilterList": [
+    "string"
+  ],
+  "lldpLevel": 0,
+  "name": "string",
+  "netconfPort": "string",
+  "noAddNewDevice": True,
+  "parentDiscoveryId": "string",
+  "passwordList": [
+    "string"
+  ],
+  "preferredMgmtIPMethod": "string",
+  "protocolOrder": "string",
+  "reDiscovery": True,
+  "retry": 0,
+  "snmpAuthPassphrase": "string",
+  "snmpAuthProtocol": "string",
+  "snmpMode": "string",
+  "snmpPrivPassphrase": "string",
+  "snmpPrivProtocol": "string",
+  "snmpROCommunity": "string",
+  "snmpROCommunityDesc": "string",
+  "snmpRWCommunity": "string",
+  "snmpRWCommunityDesc": "string",
+  "snmpUserName": "string",
+  "snmpVersion": "string",
+  "timeout": 0,
+  "updateMgmtIp": True,
+  "userNameList": [
+    "string"
+  ]
 }
 
     

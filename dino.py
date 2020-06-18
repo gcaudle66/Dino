@@ -7,7 +7,8 @@ global wifi_inv
 global DEBUGstatus
 global test_mode
 global session_data
-
+global apRename_run
+apRename_run = False
 test_mode = False
 DEBUGstatus = False
 ##dnac_savedCreds = True
@@ -79,6 +80,8 @@ def dino_main():
     """
     import logging
     global DEBUGstatus
+    global apRename_run
+    apRename_run = False
     choice = 0
     menu_choices = {}
     while True:
@@ -317,6 +320,7 @@ def dino1_connex_build(split_conns):
     """
     """
     global session_data
+    global apRename_run
     connex_list = ap_rename20.create_connex_list(split_conns)
     ap_rename20.forAPI = True
     connArgs = ap_rename20.get_conn_args()
@@ -337,6 +341,7 @@ def dino1_connex_build(split_conns):
             print("\n")
             choice = input("Press [Enter] to return to API Main Menu\n" \
                            "  or Ctrl-C to quit                       ")
+            apRename_run = False
             api_main_menu()
             break
 
@@ -390,6 +395,7 @@ def dino2_sync():
         index = index + 1
     rtrn_choice_num = index + 1
     rtrn_item = ("Choice #{} : Return to API Main Menu ".format(rtrn_choice_num))
+    print(rtrn_item)
     print("*********************************************************\n");
     choice = int(input(" Input choice number from above : "))
     dev_uuid = dnac_inv[choice].get("instanceUuid")
@@ -700,80 +706,162 @@ def api_main2():
 def api_main_menu():
     """
     """
+    import json
+    from dnac_api import iterate_dnac_inventory
     global test_mode
+    global apRename_run
+    site_list = dnac_api.dnac_site_list
+    menu_apRename = "[0] AP Rename - DNAC->CSV Comparison & Finalize"
+    if apRename_run == True:
+        label0 = menu_apRename
+    else:
+        label0 = ""
     choice = 0
-    print("\n\n\n")
-    print("*********************************************************");
-    print("*                                                       *");
-    print("* Dino | ConneX <-|-> DNA Center API Main Menu          *");
-    print("*                                                       *");
-    print("*                                                       *");
-    print("*********************************************************");
-    print("* Choose next step to continue.                         *");
-    print("* Intent Menu --------                                  *");
-    print("*                                                       *");
-    print("* [1] AP Rename Cont'd - DNAC->CSV Comparison & Finalize*");
-    print("* [2] Resync Device - Force Inventory Resync on Device  *");
-    print("* [9] Return to Main Menu                               *");
-    print("*                                                       *");                            
-    print("*                                                       *");
-    print("* Control C to exit                                     *");
-    print("*********************************************************");
-    choice = int(input("* Intent Menu Choice [#] :  "))
-    print("\n\n")
-    if choice == 1:
-        wifi_inv = []
+    menu_choices = {
+        "1": "AP Rename Cont'd - DNAC->CSV Comparison & Finalize", "2": "Resync Device - Force Inventory Resync on Device"}
+    while True:
+        print("\n\n\n")
+        print("*********************************************************");
+        print("*                                                       *");
+        print("* Dino | ConneX <-|-> DNA Center API Main Menu          *");
+        print("*                                                       *");
+        print("*                                                       *");
+        print("*********************************************************");
+        print("* Choose next step to continue.                         ");
+        print("* Intent Menu --------                                  ");
+        print("  {}                                                    ".format(label0))
+        print("  [1] Browse Collected DNA Center Inventory             ")
+        print("  [2] Resync Device - Force Inventory Resync on Device  ");
+        print("  [3] Download/Browse DNAC Site Hierarchy")
+        print("  [4] Add Device Manually                               ")
+        print("  [5] Start a Discovery                                 ")
+        print("  [6] Add Site Hierachy                                 ")
+        print("  [9] Return to Main Menu                               ");
+        print("*********************************************************");
         try:
-            wifi_inv = dnac_api.wifi_inventory(wifi_inv, dnac_connArgs)
+            choice = int(input("* Intent Menu Choice [#] :  "))
+        except ValueError as verr:
+            #logging.debug("Exception occured as: " + str(verr))
+            print("\n\n")
+            print("*********************************************************");
+            print("* Dino | ConneX ERROR                                   *");
+            print("*********************************************************");
+            print(f" ERROR                                        \n" \
+                  " E                                             \n" \
+                  " ERROR : Value entered is not valid,           \n" \
+                  " E           therefore it is invalid!          \n" \
+                  " ERROR       Give us a number please!          \n" \
+                  "Expecting Value of Type: {} | Please Try Again \n" \
+                  "Error Details: {}\n\n".format(type(choice), verr))
+            cont = input("--> Press [Enter] to Try Again or Ctrl-C to quit   \n")
+            continue
         except Exception as exc:
-            print("\n")
+            #logging.debug("Exception occured as: " + str(exc))
+            print("\n\n")
             print("*********************************************************");
-            print("* Dino | Cisco DNA Center REST API Connex               *");
+            print("* Dino | ConneX ERROR                                   *");
             print("*********************************************************");
-            print("*                                                       *");
-            print("* Something went wonky and an exception got thrown      *");
-            print("*                                                       *");
-            print("*   Press Enter key to restart program or               *");
-            print("*     Control-C to exit                                 *");
-            print("*********************************************************");
-            print(exc)
-            err = input("*********************************************************")
-            api_main_menu()
+            print(f" ERROR                                  \n" \
+                  " E                                      \n" \
+                  " ERROR : An Exception was Thrown!\n" \
+                  " E           (which is bad)  \n" \
+                  " ERROR                                  \n" \
+                  "Arguments Entered: [{}] Please Try Again \n" \
+                  "Error Details: {}\n\n".format(exc.args, exc))
+            cont = input("--> Press [Enter] to Try Again or Ctrl-C to quit   \n")
+            continue
         else:
-            print("\n\n\n")
-            print("*********************************************************\n" \
-                  "* WiFi Inventory Collection was a Success!              *\n" \
-                  f"* Total WLCs: [{len(wifi_inv[0])}]                      \n" \
-                  f"* Total APs: [{len(wifi_inv[1])}]                       \n" \
-                  "*********************************************************\n")
-            if len(wifi_inv[1]) == 0:
-                    print("\n\n\n")
+            print("\n\n")
+            if choice == 0:
+                wifi_inv = []
+                try:
+                    wifi_inv = dnac_api.wifi_inventory(wifi_inv, dnac_connArgs)
+                except Exception as exc:
+                    print("\n")
                     print("*********************************************************");
                     print("* Dino | Cisco DNA Center REST API Connex               *");
                     print("*********************************************************");
                     print("*                                                       *");
-                    print("*            Houston, we have a problem!                *");
-                    print("* No APs we were found in the inventory that Dino       *");
-                    print("* pulled from DNA Center. Printing all device \"family\"  *");
-                    print("* and \"platformIds\" in the DNAC inventory below.       *");
-                    print("* If any APs are in fact in the inventory, capture this *");
-                    print("* output and send to dev-team advising them it no worky!*");
+                    print("* Something went wonky and an exception got thrown      *");
                     print("*                                                       *");
-                    print("* Dino will now quit to flush any data just in case.    *");
-                    print("* Press [Enter] to quit then relaunch Dino.             *");
+                    print("*   Press Enter key to restart program or               *");
+                    print("*     Control-C to exit                                 *");
                     print("*********************************************************");
-                    for item in dnac_api.dnac_inventory:
-                        print(item.get("family"))
-                        print(item.get("platformId"))
-                        print("---------------------")
+                    print(exc)
                     err = input("*********************************************************")
-                    quit()
-            parsedAPI = ap_rename20.parseAPI(wifi_inv)
-            matches = ap_rename20.api_compare(ap_rename20.final_APIresults)
-            return dino1_connex(ap_rename20.matches)
-    elif choice == 2:
-        dino2_sync()
-    return wifi_inv
+                    continue
+                else:
+                    print("\n\n\n")
+                    print("*********************************************************\n" \
+                          "* WiFi Inventory Collection was a Success!              *\n" \
+                          f"* Total WLCs: [{len(wifi_inv[0])}]                      \n" \
+                          f"* Total APs: [{len(wifi_inv[1])}]                       \n" \
+                          "*********************************************************\n")
+                    if len(wifi_inv[1]) == 0:
+                            print("\n\n\n")
+                            print("*********************************************************");
+                            print("* Dino | Cisco DNA Center REST API Connex               *");
+                            print("*********************************************************");
+                            print("*                                                       *");
+                            print("*            Houston, we have a problem!                *");
+                            print("* No APs we were found in the inventory that Dino       *");
+                            print("* pulled from DNA Center. Printing all device \"family\"  *");
+                            print("* and \"platformIds\" in the DNAC inventory below.       *");
+                            print("* If any APs are in fact in the inventory, capture this *");
+                            print("* output and send to dev-team advising them it no worky!*");
+                            print("*                                                       *");
+                            print("* Dino will now quit to flush any data just in case.    *");
+                            print("* Press [Enter] to quit then relaunch Dino.             *");
+                            print("*********************************************************");
+                            for item in dnac_api.dnac_inventory:
+                                print(item.get("family"))
+                                print(item.get("platformId"))
+                                print("---------------------")
+                            err = input("*********************************************************")
+                            quit()
+                    parsedAPI = ap_rename20.parseAPI(wifi_inv)
+                    matches = ap_rename20.api_compare(ap_rename20.final_APIresults)
+                    break
+                    return dino1_connex(ap_rename20.matches)
+            elif choice == 1:
+                done = dnac_api.iterate_dnac_inventory()
+                api_main_menu()
+                break
+            elif choice == 2:
+                dino2_sync()
+                break
+            elif choice == 3:
+                site_list = dnac_api.get_site()
+                for site in site_list["response"]:
+                    print("Site Name: {} \nSite Hierarchy: {}\nSite Type: {}\n".format(site_list["name"], site_list["groupNameHierarchy"], site_list["response"][0]["additionalInfo"][0]["attributes"]["type"]))
+                    cont = input("----------[Enter]----------")
+                exit = input("---------End of Site List. Press [Enter] to Return to API Main Menu--------")
+                return api_main_menu()
+            elif choice == 4:
+                result = add_device()
+                print(result)
+                cont = input("------- Press [Enter] to return to API Main Menu --------")
+                break
+            elif choice == 6:
+                result = dnac_api.add_site()
+                break
+            elif choice == 9:
+                dino_main()
+                break
+            else:
+                print("\n\n")
+                print("*********************************************************");
+                print("* Dino | ConneX ERROR                                   *");
+                print("*********************************************************");
+                print(f" ERROR                                  \n" \
+                          " E                                      \n" \
+                          " ERROR : Value entered is not a valid option,\n" \
+                          " E           therefore it is invalid!  \n" \
+                          " ERROR                                  \n" \
+                          "Value Entered: [{}] Does not exist. Please Try Again \n".format(choice))
+                cont = input("--> Press [Enter] to Continue or Ctrl-C to quit   \n")
+                continue
+##    return wifi_inv
 
 
 def main3():

@@ -616,6 +616,7 @@ def formatMacs(content):
     print("*********************************************************");
     for row in range(len(final_CSVresults)):
         print(final_CSVresults[row], sep="\n")
+    dino.apRename_run = True
     return dino.api_main()
 
 
