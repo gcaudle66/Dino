@@ -11,14 +11,14 @@ global apRename_run
 apRename_run = False
 test_mode = False
 DEBUGstatus = False
-##dnac_savedCreds = True
 dnac_savedCreds = False
-##dnac_connArgs = {"cluster": "198.18.129.100",
-##                 "username": "admin",
-##                "password": "C1sco12345"}
+##dnac_savedCreds = False
+##dnac_connArgs = {"cluster": "sandboxdnac2.cisco.com",
+##                 "username": "devnetuser",
+##                "password": "Cisco123!"}
 dnac_connArgs = {}
 session_data = []
-
+sandboxdnac2 = "sandboxdnac2.cisco.com"
 # Version and Author Info
 __version__ = "2.0"
 __author__ = "Garrett Caudle | gcaudle66@gmail.com"
@@ -81,6 +81,12 @@ def dino_main():
     import logging
     global DEBUGstatus
     global apRename_run
+    # logging, debug level, to file {dino.log}
+    logging.basicConfig(
+        filename='dino.log',
+        level=logging.DEBUG,
+        format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S')
     apRename_run = False
     choice = 0
     menu_choices = {}
@@ -88,15 +94,15 @@ def dino_main():
         print("*********************************************************");
         print("*                                                       *");
         print("* Dino | Manually Helping You to Automate. v{}         *".format(__version__));
-        print("*                                                       *");
+        print("*        Powered by Dino -ConneX-> System               *");
         print("*                                                       *")
         print("*********************************************************");
         print("* Please indicate intent using the options below        *");
         print("* Intent Menu --------                                  *");
         print("*                                                       *");
-        print("* [1] AP Rename Utility (Use DNAC for AP->WLC Mappings) *");
-        print("* [2] AP Renamer Classic v1.8 (Single WLC)              *");
-        print("* [3] DNAC API ConneX                                   *");
+        print("* [1] Bulk AP Rename for Multi-WLC, DNAC Managed Sites  *");
+        print("* [2] Bulk AP Renamer Classic (v1.8) for Direct 1:1 WLC *");
+        print("* [3] Interact with DNAC APIs via -ConneX->API Utility   *");
         print("*                                                       *");                            
         print(f"*                                                       *");
         print("* Control-C to exit                                     *");
@@ -723,18 +729,18 @@ def api_main_menu():
         print("\n\n\n")
         print("*********************************************************");
         print("*                                                       *");
-        print("* Dino | ConneX <-|-> DNA Center API Main Menu          *");
+        print("* Dino | -ConneX-> DNA Center API Main Menu             *");
         print("*                                                       *");
         print("*                                                       *");
         print("*********************************************************");
-        print("* Choose next step to continue.                         ");
+        print("* Interact with APIs via Options Below                   ");
         print("* Intent Menu --------                                  ");
         print("  {}                                                    ".format(label0))
         print("  [1] Browse Collected DNA Center Inventory             ")
         print("  [2] Resync Device - Force Inventory Resync on Device  ");
-        print("  [3] Download/Browse DNAC Site Hierarchy")
-        print("  [4] Add Device Manually                               ")
-        print("  [5] Start a Discovery                                 ")
+        print("  [3] Download All Configs from Inventory Locally        ")
+        #print("  [4] Add Device Manually                               ")
+        #print("  [5] Start a Discovery                                 ")
         print("  [6] Add Site Hierachy                                 ")
         print("  [9] Return to Main Menu                               ");
         print("*********************************************************");
@@ -831,11 +837,36 @@ def api_main_menu():
                 dino2_sync()
                 break
             elif choice == 3:
-                site_list = dnac_api.get_site()
-                for site in site_list["response"]:
-                    print("Site Name: {} \nSite Hierarchy: {}\nSite Type: {}\n".format(site_list["name"], site_list["groupNameHierarchy"], site_list["response"][0]["additionalInfo"][0]["attributes"]["type"]))
-                    cont = input("----------[Enter]----------")
-                exit = input("---------End of Site List. Press [Enter] to Return to API Main Menu--------")
+                dnac_inventory = dnac_api.dnac_inventory
+                devCnt = len(dnac_inventory)
+                print("*********************************************************");
+                print("* Dino | ConneX                                         *");
+                print("*********************************************************");
+                print("Be advised. There are a total of : {} " \
+                      "Devices in DNAC inventory you have requested to dump.   \n" \
+                      "This could take a considerable amount of time and might \n" \
+                      "Fail if devices are not configured correct.             \n" \
+                      "Shall we proceed or return to API Main Menu?            ".format(devCnt))
+                print("*********************************************************")
+                choice = int(input(" [1] Proceed | [2] Return or Control-C to exit : "))
+                if choice == 1:
+                    results = dnac_api.config_dump(dnac_inventory)
+                elif choice == 2:
+                    api_main_menu()
+                else:
+                    print("\n\n")
+                    print("*********************************************************");
+                    print("* Dino | ConneX ERROR                                   *");
+                    print("*********************************************************");
+                    print(f" ERROR                                  \n" \
+                              " E                                      \n" \
+                              " ERROR : Value entered is not a valid option,\n" \
+                              " E           therefore it is invalid!  \n" \
+                              " ERROR                                  \n" \
+                              "Value Entered: [{}] Does not exist. Please Try Again \n".format(choice))
+                    cont = input("--> Press [Enter] to Continue or Ctrl-C to quit   \n")
+                    continue
+                print(results)
                 return api_main_menu()
             elif choice == 4:
                 result = add_device()

@@ -3,6 +3,8 @@ from requests.auth import HTTPBasicAuth
 import base64
 import logging
 import dino
+import time
+import json
 requests.packages.urllib3.disable_warnings()
 global debug_status
 global dnac_token
@@ -14,8 +16,10 @@ global dnac_inventory
 #global wifi_inv
 global recent_urls
 global json_data
+global DNAC_URL
 
 local_dnac_connArgs = {}
+DNAC_URL = ""
 dnac_token_expired = True
 debug_status = False
 dnac_site_list = {}
@@ -23,11 +27,13 @@ json_data = []
 
 
 ## Common DNAC API URLs to call in functioons
-
+##class APICall:
+##    def __init__(self, name, base_url, api_path, method) 
 
 def get_dnac_token(dnac_connArgs):
     global dnac_token
     global local_dnac_connArgs
+    global DNAC_URL
     global json_data
     local_dnac_connArgs = dnac_connArgs.copy()
     json_data = []
@@ -55,6 +61,7 @@ def get_dnac_token(dnac_connArgs):
         cont = input("Press [Enter] to try again or Ctrl-C to quit")
         dino.api_main()
     else:
+        DNAC_URL = "https://" + local_dnac_connArgs["cluster"]
         response_code = token.status_code
         print(f"Status Code: {token.status_code}")
         if response_code == 200:
@@ -519,7 +526,226 @@ def add_site():
     print(devName)
     return post_intent_base(addSite, api_path, headers)
 
-    
+
+def config_dump(dnac_inventory):
+    """
+    This script will monitor device configuration changes. It could be executed on demand,
+    periodically (every 60 minutes, for example) or continuously.
+    It will collect the configuration file for each DNA Center managed device, compare with the existing cached file,
+    and detect if any changes.
+    When changes detected, identify the last user that configured the device, and create a new ServiceNow incident.
+    Automatically roll back all non-compliant configurations, or save new configurations if approved in ServiceNow.
+    Device configuration files managemnt using RESTCONF and NETCONF
+    Compliance checks at this time:
+    - no Access Control Lists changes
+    - no logging changes
+    - no duplicated IPv4 addresses
+    """
+    import os
+    # Determine number of devices to dump and approve
+    devCnt = len(dnac_inventory)
+
+    print('Application config_dump starting...cross your fingers!')
+    # create a local directory for all the configuration files
+    # check if 'Config_Files' folder exists and create one if it does not
+
+    if not os.path.exists('Config_Files'):
+        os.makedirs('Config_Files')
+
+    os.chdir('Config_Files')
+
+    # logging, debug level, to file {application_run.log}
+    logging.basicConfig(
+        filename='config_dump_run.log',
+        level=logging.DEBUG,
+        format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S')
+
+    while devCnt != 0:
+
+        # get the DNA C auth token
+        # ORIGINAL LINE:dnac_token = dnac_apis.get_dnac_jwt_token(DNAC_AUTH)
+        global dnac_token
+
+        temp_run_config = 'temp_run_config.txt'
+
+        # get the DNA C managed devices list (excluded wireless, for one location)
+        all_devices_info = dnac_inventory#ORIGINAL LINE:dnac_apis.get_all_device_info(dnac_token)
+        all_devices_hostnames = []
+        for device in all_devices_info:
+            print(device['hostname'])
+            all_devices_hostnames.append(device['hostname'])
+##        for device in all_devices_info:
+##            if device['family'] == 'Switches and Hubs' or device['family'] == 'Routers':
+##                if 'CSR1Kv' in device['hostname'] or 'NYC' in device['hostname']:
+##                    all_devices_hostnames.append(device['hostname'])
+
+        # get the config files, compare with existing (if one existing). Save new config if file not existing.
+        for device in all_devices_info:
+            t = time.localtime()
+            deviceId = device["id"]
+            tStamp = str("{}{}{}{}{}".format(t.tm_mon, t.tm_mday, t.tm_year, t.tm_hour, t.tm_min))
+            device_run_config = get_output_command_runner('show running-config', deviceId, dnac_token)
+            filename = str(device["hostname"]) + '_' + tStamp + '_run_config.txt'
+
+            # save the running config to a temp file
+##
+##            f_temp = open(temp_run_config, 'w')
+##            f_temp.write(device_run_config)
+##            f_temp.seek(0)  # reset the file pointer to 0
+##            f_temp.close()
+
+            f_config = open(filename, 'w')
+            f_config.write(device_run_config)
+            f_config.seek(0)
+            f_config.close()
+##
+##            # retrieve the device management IP address
+##            device_mngmnt_ip_address = dnac_apis.get_device_management_ip(device, dnac_token)
+##
+##            # Save the running configuration as a baseline configuration local on each device
+##            # flash:/config_mon_baseline
+##
+##            netconf_restconf.netconf_save_running_config_to_file('flash:/config_mon_baseline', device_mngmnt_ip_address,
+##                                                                IOS_XE_PORT, IOS_XE_USER, IOS_XE_PASS)
+##
+            print('Device Config Saved : ' + device["hostname"] + ' - as ' + filename)
+            devCnt = devCnt - 1
+    results = str("Config Dump Complete. Number of Configs Processed: {}".format(len(all_devices_hostnames)))
+    return results
+
+
+def get_output_command_runner(command, deviceId, dnac_jwt_token):
+    """
+    This function will return the output of the CLI command specified in the {command}, sent to the device with the
+    hostname {device}
+    :param command: CLI command
+    :param device_name: device hostname
+    :param dnac_jwt_token: DNA C token
+    :return: file with the command output
+    """
+
+    # get the DNA C device id
+    device_id = deviceId
+
+    # get the DNA C task id that will process the CLI command runner
+    payload = {
+        "commands": [command],
+        "deviceUuids": [device_id],
+        "timeout": 0
+        }
+    url = DNAC_URL + '/api/v1/network-device-poller/cli/read-request'
+    header = {'content-type': 'application/json', 'x-auth-token': dnac_jwt_token}
+    response = requests.post(url, data=json.dumps(payload), headers=header, verify=False)
+    response_json = response.json()
+    task_id = response_json['response']['taskId']
+    print(response_json)
+    # get task id status
+    time.sleep(5)  # wait for a second to receive the file name
+    task_result = check_task_id_output(task_id, dnac_jwt_token)
+    file_info = json.loads(task_result['progress'])
+    file_id = file_info['fileId']
+
+    # get output from file
+    time.sleep(2)  # wait for two seconds for the file to be ready
+    file_output = get_content_file_id(file_id, dnac_jwt_token)
+    command_responses = file_output[0]['commandResponses']
+    if command_responses['SUCCESS'] is not {}:
+        command_output = command_responses['SUCCESS'][command]
+    elif command_responses['FAILURE'] is not {}:
+        command_output = command_responses['FAILURE'][command]
+    else:
+        command_output = command_responses['BLACKLISTED'][command]
+    return command_output
+
+
+def get_content_file_id(file_id, dnac_jwt_token):
+    """
+    This function will download a file specified by the {file_id}
+    :param file_id: file id
+    :param dnac_jwt_token: DNA C token
+    :return: file
+    """
+    url = DNAC_URL + '/api/v1/file/' + file_id
+    header = {'content-type': 'application/json', 'x-auth-token': dnac_jwt_token}
+    response = requests.get(url, headers=header, verify=False, stream=True)
+    response_json = response.json()
+    return response_json
+
+
+def get_all_device_info(dnac_jwt_token):
+    """
+    The function will return all network devices info
+    :param dnac_jwt_token: DNA C token
+    :return: DNA C device inventory info
+    """
+    url = DNAC_URL + '/api/v1/network-device'
+    header = {'content-type': 'application/json', 'x-auth-token': dnac_jwt_token}
+    all_device_response = requests.get(url, headers=header, verify=False)
+    all_device_info = all_device_response.json()
+    return all_device_info['response']
+
+
+
+def get_device_id_name(device_name, dnac_jwt_token):
+    """
+    This function will find the DNA C device id for the device with the name {device_name}
+    :param device_name: device hostname
+    :param dnac_jwt_token: DNA C token
+    :return:
+    """
+    device_id = None
+    device_list = get_all_device_info(dnac_jwt_token)
+    for device in device_list:
+        if device['hostname'] == device_name:
+            device_id = device['id']
+    return device_id
+
+
+def check_task_id_output(task_id, dnac_jwt_token):
+    """
+    This function will check the status of the task with the id {task_id}. Loop one seconds increments until task is completed
+    :param task_id: task id
+    :param dnac_jwt_token: DNA C token
+    :return: status - {SUCCESS} or {FAILURE}
+    """
+    url = DNAC_URL + '/api/v1/task/' + task_id
+    header = {'content-type': 'application/json', 'x-auth-token': dnac_jwt_token}
+    completed = 'no'
+    while completed == 'no':
+        try:
+            task_response = requests.get(url, headers=header, verify=False)
+            task_json = task_response.json()
+            task_output = task_json['response']
+            completed = 'yes'
+        except:
+            time.sleep(1)
+    return task_output
+
+
+
+
+def check_task_id_status(task_id, dnac_jwt_token):
+    """
+    This function will check the status of the task with the id {task_id}
+    :param task_id: task id
+    :param dnac_jwt_token: DNA C token
+    :return: status - {SUCCESS} or {FAILURE}
+    """
+    url = DNAC_URL + '/api/v1/task/' + task_id
+    header = {'content-type': 'application/json', 'x-auth-token': dnac_jwt_token}
+    task_response = requests.get(url, headers=header, verify=False)
+    task_json = task_response.json()
+    task_status = task_json['response']['isError']
+    if not task_status:
+        task_result = 'SUCCESS'
+    else:
+        task_result = 'FAILURE'
+    return task_result
+
+
+
+
 
 def enable_req_debug():
     global debug_status
