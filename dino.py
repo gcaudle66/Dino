@@ -47,6 +47,8 @@ def dinoValueError(location):
           "Error Details: {}\n\n".format(type(choice), verr))
     return location()
 
+message = "hello Pycharm"
+
 
 class ConnexList(object):
 	def __init__(self, match_list):
