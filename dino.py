@@ -91,30 +91,30 @@ def dino_main():
     choice = 0
     menu_choices = {}
     while True:
-        print("*********************************************************");
-        print("*                                                       *");
-        print("* Dino | Manually Helping You to Automate. v{}         *".format(__version__));
-        print("*        Powered by Dino -ConneX-> System               *");
+        print("*********************************************************")
         print("*                                                       *")
-        print("*********************************************************");
-        print("* Please indicate intent using the options below        *");
-        print("* Intent Menu --------                                  *");
-        print("*                                                       *");
-        print("* [1] Bulk AP Rename for Multi-WLC, DNAC Managed Sites  *");
-        print("* [2] Bulk AP Renamer Classic (v1.8) for Direct 1:1 WLC *");
-        print("* [3] Interact with DNAC APIs via -ConneX->API Utility   *");
-        print("*                                                       *");                            
-        print(f"*                                                       *");
-        print("* Control-C to exit                                     *");
-        print("*********************************************************");
+        print("* Dino | Manually Helping You to Automate. v{}         *".format(__version__))
+        print("*        Powered by Dino -ConneX-> System               *")
+        print("*                                                       *")
+        print("*********************************************************")
+        print("* Please indicate intent using the options below        *")
+        print("* Intent Menu --------                                  *")
+        print("*                                                       *")
+        print("* [1] Bulk AP Rename for Multi-WLC, DNAC Managed Sites  *")
+        print("* [2] Bulk AP Renamer Classic (v1.8) for Direct 1:1 WLC *")
+        print("* [3] Interact with DNAC APIs via -ConneX->API Utility   *")
+        print("*                                                       *")
+        print(f"*                                                       *")
+        print("* Control-C to exit                                     *")
+        print("*********************************************************")
         try:
             choice = int(input("* Intent Menu Choice [#] :  "))
         except ValueError as verr:
             logging.debug("Exception occured as: " + str(verr))
             print("\n\n")
-            print("*********************************************************");
-            print("* Dino | ConneX ERROR                                   *");
-            print("*********************************************************");
+            print("*********************************************************")
+            print("* Dino | ConneX ERROR                                   *")
+            print("*********************************************************")
             print(f" ERROR                                  \n" \
                   " E                                      \n" \
                   " ERROR : Value entered is not a valid value,\n" \
@@ -127,9 +127,9 @@ def dino_main():
         except Exception as exc:
             logging.debug("Exception occured as: " + str(exc))
             print("\n\n")
-            print("*********************************************************");
-            print("* Dino | ConneX ERROR                                   *");
-            print("*********************************************************");
+            print("*********************************************************")
+            print("* Dino | ConneX ERROR                                   *")
+            print("*********************************************************")
             print(f" ERROR                                  \n" \
                   " E                                      \n" \
                   " ERROR : An Exception was Thrown!\n" \
@@ -159,9 +159,9 @@ def dino_main():
                     dino_main()
             else:
                 print("\n\n")
-                print("*********************************************************");
-                print("* Dino | ConneX ERROR                                   *");
-                print("*********************************************************");
+                print("*********************************************************")
+                print("* Dino | ConneX ERROR                                   *")
+                print("*********************************************************")
                 print(f" ERROR                                  \n" \
                       " E                                      \n" \
                       " ERROR : Value entered is not a valid value,\n" \
@@ -178,15 +178,15 @@ def dino1_main():
     """
     print("\n\n\n")
     while True:
-        print("*********************************************************");
-        print("* Dino | AP Rename Utility                              *");
-        print("*********************************************************");
-        print("*                                                       *");
-        print("* Import CSV - Ensure CSV file to import is placed in   *");
-        print("*              current DIR and proceed.                 *");
-        print("*                                                       *");
-        print("*        [1] Yes | [2] No or Control-C to exit          *");
-        print("*********************************************************");
+        print("*********************************************************")
+        print("* Dino | AP Rename Utility                              *")
+        print("*********************************************************")
+        print("*                                                       *")
+        print("* Import CSV - Ensure CSV file to import is placed in   *")
+        print("*              current DIR and proceed.                 *")
+        print("*                                                       *")
+        print("*        [1] Yes | [2] No or Control-C to exit          *")
+        print("*********************************************************")
         cont = False
         choice = 0
         try:
@@ -194,9 +194,9 @@ def dino1_main():
         except ValueError as verr:
             #logging.debug("Exception occured as: " + str(verr))
             print("\n\n")
-            print("*********************************************************");
-            print("* Dino | ConneX ERROR                                   *");
-            print("*********************************************************");
+            print("*********************************************************")
+            print("* Dino | ConneX ERROR                                   *")
+            print("*********************************************************")
             print(f" ERROR                                  \n" \
                   " E                                      \n" \
                   " ERROR : Value entered is not a valid value,\n" \
@@ -209,9 +209,9 @@ def dino1_main():
         except Exception as exc:
             #logging.debug("Exception occured as: " + str(exc))
             print("\n\n")
-            print("*********************************************************");
-            print("* Dino | ConneX ERROR                                   *");
-            print("*********************************************************");
+            print("*********************************************************")
+            print("* Dino | ConneX ERROR                                   *")
+            print("*********************************************************")
             print(f" ERROR                                  \n" \
                   " E                                      \n" \
                   " ERROR : An Exception was Thrown!\n" \
@@ -238,9 +238,9 @@ def dino1_main():
                 break
             else:
                 print("\n\n")
-                print("*********************************************************");
-                print("* Dino | ConneX ERROR                                   *");
-                print("*********************************************************");
+                print("*********************************************************")
+                print("* Dino | ConneX ERROR                                   *")
+                print("*********************************************************")
                 print(f" ERROR                                  \n" \
                       " E                                      \n" \
                       " ERROR : Value entered is not a valid value,\n" \
@@ -257,18 +257,18 @@ def dino1_connex(matches):
     """
     """
     if len(ap_rename20.matches) == 0:
-        print("*********************************************************");
-        print("* Dino | ConneX ERROR                                   *");
-        print("*********************************************************");
-        print("*                                                       *");
-        print("*             Houston, we have a problem!               *");
-        print("* Dino is unable to find any matches between the CSV    *");
-        print("* file that was imported and the APs that were listed   *");
-        print("* in the inventory pulled from DNA Center.              *");
-        print("*                                                       *");
-        print(f"* Could be our issue...could be yours!                  *");
-        print("* Press Enter key to return to Main Menu                *");
-        print("*                                                       *");
+        print("*********************************************************")
+        print("* Dino | ConneX ERROR                                   *")
+        print("*********************************************************")
+        print("*                                                       *")
+        print("*             Houston, we have a problem!               *")
+        print("* Dino is unable to find any matches between the CSV    *")
+        print("* file that was imported and the APs that were listed   *")
+        print("* in the inventory pulled from DNA Center.              *")
+        print("*                                                       *")
+        print(f"* Could be our issue...could be yours!                  *")
+        print("* Press Enter key to return to Main Menu                *")
+        print("*                                                       *")
         err = input("*********************************************************")
         quit()
     split_conns = ap_rename20.connex_split()
@@ -277,47 +277,47 @@ def dino1_connex(matches):
     if (ap_rename20.entries == len(ap_rename20.matches)) and (len(ap_rename20.matches) > 0):
         lenMatch = True
     else:
-        print("*********************************************************");
-        print("* Dino | ConneX ERROR                                   *");
-        print("*********************************************************");
-        print("*                                                       *");
-        print("* Houston, we have a problem!                           *");
-        print("* For some reason, the # of matches found               *");
-        print("* between the CSV and API do not match after parsing.   *");
-        print("* ERROR is unrecoverable! Quit and Relaunch program.    *");
-        print(f"*    Found: {entries} vs. {len(ap_rename20.matches)}      *");
-        print("* Press Enter key to quit program.                   *");
-        print("*                                                       *");
+        print("*********************************************************")
+        print("* Dino | ConneX ERROR                                   *")
+        print("*********************************************************")
+        print("*                                                       *")
+        print("* Houston, we have a problem!                           *")
+        print("* For some reason, the # of matches found               *")
+        print("* between the CSV and API do not match after parsing.   *")
+        print("* ERROR is unrecoverable! Quit and Relaunch program.    *")
+        print(f"*    Found: {entries} vs. {len(ap_rename20.matches)}      *")
+        print("* Press Enter key to quit program.                   *")
+        print("*                                                       *")
         err = input("*********************************************************")
         quit()
     while lenMatch:
         print("\n\n\n")
-        print("*********************************************************");
-        print("* Dino | AP Rename Utility                              *");
-        print("*********************************************************");
-        print("* SSH ConneX - Analysis of CSV and API data             *");
-        print("*********************************************************\n");
-        print("*                                                       *");
+        print("*********************************************************")
+        print("* Dino | AP Rename Utility                              *")
+        print("*********************************************************")
+        print("* SSH ConneX - Analysis of CSV and API data             *")
+        print("*********************************************************\n")
+        print("*                                                       *")
         print(f"* Matches found : {ap_rename20.entries}                         ")
         print(f"* Number of WLCs to connect to : {len(split_conns)} ")
-        print("*                                                       *");
-        print("*********************ATTENTION***************************");
-        print(" Now we will start connecting to WLCs and making magic   \n" \
-              " happen. The script ASSUMES the same username/password   \n" \
-              " combo can be used across all WLCs in this process. If   \n" \
-              " this is not the case, the script will fail as DINO is   \n" \
-              " not setup to handle item-by-item authentication. Not    \n" \
-              " that it cannot do it, it has the power, thats just to   \n" \
-              " much typing and hassle for my creator to deal with.     \n" \
-              " With that said...                                       \n" \
-              "  -If WLCs share login info, Press [Enter] to continue   \n" \
+        print("*                                                       *")
+        print("*********************ATTENTION***************************")
+        print(" Now we will start connecting to WLCs and making magic   \n"
+              " happen. The script ASSUMES the same username/password   \n"
+              " combo can be used across all WLCs in this process. If   \n"
+              " this is not the case, the script will fail as DINO is   \n"
+              " not setup to handle item-by-item authentication. Not    \n"
+              " that it cannot do it, it has the power, thats just to   \n"
+              " much typing and hassle for my creator to deal with.     \n"
+              " With that said...                                       \n"
+              "  -If WLCs share login info, Press [Enter] to continue   \n"
               "  -If not, exit script and resolve or run script per WLC \n")
-        print("*********************************************************");
-        print("*                 Are you ready?? :                     *");
+        print("*********************************************************")
+        print("*                 Are you ready?? :                     *")
         cont = input("      [Enter] to continue or [Ctrl-C] to exit            ")
         print("\n\n")
-        print("Hold on tight! If my calculations are correct, \n" \
-              "when this baby hits 88 miles per hour, \n" \
+        print("Hold on tight! If my calculations are correct, \n"
+              "when this baby hits 88 miles per hour, \n"
               "you're gonna see some serious...\n\n")
         return dino1_connex_build(split_conns)
 
@@ -338,14 +338,14 @@ def dino1_connex_build(split_conns):
             print(exc)
             continue
         else:
-            print("*********************************************************");
-            print("* Dino | SSH ConneX Completion Report                   *");
-            print("*********************************************************");
+            print("*********************************************************")
+            print("* Dino | SSH ConneX Completion Report                   *")
+            print("*********************************************************")
             for item in conn_report:
                 print(item)
             session_data.append
             print("\n")
-            choice = input("Press [Enter] to return to API Main Menu\n" \
+            choice = input("Press [Enter] to return to API Main Menu\n"
                            "  or Ctrl-C to quit                       ")
             apRename_run = False
             api_main_menu()
@@ -387,12 +387,12 @@ def dino2_sync():
     dnac_inv = dnac_api.gather_inv_devices()
     choice = 0
     index = 0
-    print("*********************************************************");
-    print("* Dino | DNA-C Device ReSync                            *");
-    print("*********************************************************");
-    print("*                                                       *");
-    print("* Choose a device below to trigger a resync.            *");
-    print("*********************************************************\n");
+    print("*********************************************************")
+    print("* Dino | DNA-C Device ReSync                            *")
+    print("*********************************************************")
+    print("*                                                       *")
+    print("* Choose a device below to trigger a resync.            *")
+    print("*********************************************************\n")
     choices_nums = []
     for item in dnac_inv:
         item = ("Choice #{} : Hostname: {} | Platform: {} |\n| MgmntIP: {}".format(index, item.get("hostname"), item.get("platformId"), item.get("mgmntIP")))
@@ -402,7 +402,7 @@ def dino2_sync():
     rtrn_choice_num = index + 1
     rtrn_item = ("Choice #{} : Return to API Main Menu ".format(rtrn_choice_num))
     print(rtrn_item)
-    print("*********************************************************\n");
+    print("*********************************************************\n")
     choice = int(input(" Input choice number from above : "))
     dev_uuid = dnac_inv[choice].get("instanceUuid")
     if choice == rtrn_choice_num:
@@ -414,9 +414,9 @@ def dino2_sync():
             except Exception as exc:
                 #logging.debug("Exception occured as: " + str(exc))
                 print("\n\n")
-                print("*********************************************************");
-                print("* Dino | ConneX ERROR                                   *");
-                print("*********************************************************");
+                print("*********************************************************")
+                print("* Dino | ConneX ERROR                                   *")
+                print("*********************************************************")
                 print(f" ERROR                                  \n" \
                       " E                                      \n" \
                       " ERROR : An Exception was Thrown!\n" \
@@ -427,34 +427,34 @@ def dino2_sync():
                 cont = input("--> Press [Enter] to Continue or Ctrl-C to quit   \n")
                 continue
             else:
-                print("*********************************************************");
-                print("* Dino | DNA-C Device ReSync                            *");
-                print("*********************************************************");
-                print("*                                                       *");
-                print("* Device resync was successfully triggered.             *");
-                print("*********************************************************\n");
+                print("*********************************************************")
+                print("* Dino | DNA-C Device ReSync                            *")
+                print("*********************************************************")
+                print("*                                                       *")
+                print("* Device resync was successfully triggered.             *")
+                print("*********************************************************\n")
                 print(sync_response)
                 prompt = input("[Enter] to Return to API Main Menu or [Ctrl-C] to exit\n\n")
                 api_main_menu()
     elif choice not in choices_nums:
-        print("*********************************************************");
-        print("* Dino | ConneX ERROR                                   *");
-        print("*********************************************************");
-        print("*                                                       *");
-        print("* Hmmm...that choice dont't make no sense??!!           *");
-        print("* It appears you have entered an invalid choice Number. *");
-        print("* Lets drop back and try again.                         *");
-        print("*********************************************************");
+        print("*********************************************************")
+        print("* Dino | ConneX ERROR                                   *")
+        print("*********************************************************")
+        print("*                                                       *")
+        print("* Hmmm...that choice dont't make no sense??!!           *")
+        print("* It appears you have entered an invalid choice Number. *")
+        print("* Lets drop back and try again.                         *")
+        print("*********************************************************")
         cont = input("--> Press [Enter] to Continue or Ctrl-C to quit   \n")
         api_main_menu()
     else:
-        print("*********************************************************");
-        print("* Dino | ConneX ERROR                                   *");
-        print("*********************************************************");
-        print("*                                                       *");
-        print("* Houston, we have a problem!                           *");
-        print("* Whatever you just entered, made no sense to us!       *");
-        print("* Please try again                                      *");
+        print("*********************************************************")
+        print("* Dino | ConneX ERROR                                   *")
+        print("*********************************************************")
+        print("*                                                       *")
+        print("* Houston, we have a problem!                           *")
+        print("* Whatever you just entered, made no sense to us!       *")
+        print("* Please try again                                      *")
         print("*********************************************************")
         cont = input("--> Press [Enter] to Continue or Ctrl-C to quit   \n")
         api_main_menu()
@@ -486,34 +486,34 @@ def api_main():
     global test_mode
     while dnac_savedCreds == False:
         print("\n\n\n")
-        print("*********************************************************");
-        print("* Dino | Cisco DNA Center REST API Connex               *");
-        print("*                                                       *");
-        print("* Please provide the following data in order to connect *");
-        print("*                                                       *");
-        print("*********************************************************");
+        print("*********************************************************")
+        print("* Dino | Cisco DNA Center REST API Connex               *")
+        print("*                                                       *")
+        print("* Please provide the following data in order to connect *")
+        print("*                                                       *")
+        print("*********************************************************")
         print("\n")
         dnac_connArgs = {"cluster": input("* DNA-C Hostname/IP : "),
                         "username": input("* Username : "),
                         "password": getpass.win_getpass("* Password : ")}
-        print("\n\n");
+        print("\n\n")
         while True:
-            print("*********************************************************");
-            print("*                                                       *");
+            print("*********************************************************")
+            print("*                                                       *")
             print("*  DNA-C Hostname/IP: " + dnac_connArgs["cluster"])
             print("*  Username: " + dnac_connArgs["username"])
-            print("*                                                       *");
+            print("*                                                       *")
             print("*        [1] Yes | [2] No or Control-C to exit          *")
-            print("*********************************************************");
+            print("*********************************************************")
             choice = 0
             try:
                 choice = int(input(" Is the above connection info correct? : "))
             except ValueError as verr:
                 #logging.debug("Exception occured as: " + str(verr))
                 print("\n\n")
-                print("*********************************************************");
-                print("* Dino | ConneX ERROR                                   *");
-                print("*********************************************************");
+                print("*********************************************************")
+                print("* Dino | ConneX ERROR                                   *")
+                print("*********************************************************")
                 print(f" ERROR                                  \n" \
                       " E                                      \n" \
                       " ERROR : Value entered is not valid,\n" \
@@ -526,9 +526,9 @@ def api_main():
             except Exception as exc:
                 #logging.debug("Exception occured as: " + str(exc))
                 print("\n\n")
-                print("*********************************************************");
-                print("* Dino | ConneX ERROR                                   *");
-                print("*********************************************************");
+                print("*********************************************************")
+                print("* Dino | ConneX ERROR                                   *")
+                print("*********************************************************")
                 print(f" ERROR                                  \n" \
                       " E                                      \n" \
                       " ERROR : An Exception was Thrown!\n" \
@@ -562,9 +562,9 @@ def api_main():
                     break
                 else:
                     print("\n\n")
-                    print("*********************************************************");
-                    print("* Dino | ConneX ERROR                                   *");
-                    print("*********************************************************");
+                    print("*********************************************************")
+                    print("* Dino | ConneX ERROR                                   *")
+                    print("*********************************************************")
                     print(f" ERROR                                  \n" \
                               " E                                      \n" \
                               " ERROR : Value entered is not a valid option,\n" \
@@ -600,16 +600,16 @@ def api_getToken():
     global dnac_connArgs
     print("\n\n\n")
     while True:
-        print("*********************************************************");
-        print("* Dino | Cisco DNA Center REST API Connex               *");
-        print("*                                                       *");
-        print("* -Connection info confirmed by user.                   *");
-        print("*                                                       *");
-        print("* Script will now connect to the DNA Center API         *");
-        print("* interface and retreive the Authentication Token       *");
-        print("*                                                       *");
-        print("*    Press [Enter] to Continue or Control-C to exit     *");
-        print("*********************************************************");
+        print("*********************************************************")
+        print("* Dino | Cisco DNA Center REST API Connex               *")
+        print("*                                                       *")
+        print("* -Connection info confirmed by user.                   *")
+        print("*                                                       *")
+        print("* Script will now connect to the DNA Center API         *")
+        print("* interface and retreive the Authentication Token       *")
+        print("*                                                       *")
+        print("*    Press [Enter] to Continue or Control-C to exit     *")
+        print("*********************************************************")
         print("\n\n")
         choice = input("")
         try:
@@ -617,9 +617,9 @@ def api_getToken():
         except ValueError as verr:
             #logging.debug("Exception occured as: " + str(verr))
             print("\n\n")
-            print("*********************************************************");
-            print("* Dino | ConneX ERROR                                   *");
-            print("*********************************************************");
+            print("*********************************************************")
+            print("* Dino | ConneX ERROR                                   *")
+            print("*********************************************************")
             print(f" ERROR                                  \n" \
                   " E                                      \n" \
                   " ERROR : Value entered is not valid,\n" \
@@ -632,9 +632,9 @@ def api_getToken():
         except Exception as exc:
             #logging.debug("Exception occured as: " + str(exc))
             print("\n\n")
-            print("*********************************************************");
-            print("* Dino | ConneX ERROR                                   *");
-            print("*********************************************************");
+            print("*********************************************************")
+            print("* Dino | ConneX ERROR                                   *")
+            print("*********************************************************")
             print(f" ERROR                                  \n" \
                   " E                                      \n" \
                   " ERROR : An Exception was Thrown!\n" \
@@ -645,12 +645,12 @@ def api_getToken():
             cont = input("--> Press [Enter] to Continue or Ctrl-C to quit   \n")
             continue
         except requests.exceptions.InvalidURL:
-            print("*********************************************************");
-            print("* Dino | ConneX ERROR                                   *");
-            print("*********************************************************");
-            print("*                                                       *");
-            print("* Houston, we have a problem!                           *");
-            print("* The URL/IP provided below is invalid. Please re-enter it.*");                        
+            print("*********************************************************")
+            print("* Dino | ConneX ERROR                                   *")
+            print("*********************************************************")
+            print("*                                                       *")
+            print("* Houston, we have a problem!                           *")
+            print("* The URL/IP provided below is invalid. Please re-enter it.*")
             print("*********************************************************")
             print(dnac_connArgs.get("cluster"))
             time.sleep(3)
@@ -667,16 +667,16 @@ def api_main2():
     global test_mode
     choice = 0
     print("\n\n\n")
-    print("*********************************************************");
-    print("* Dino | Cisco DNA Center REST API Connex               *");
-    print("*                                                       *");
-    print("* -Success! Script retreived Auth Token from DNAC.      *");
-    print("*                                                       *");
-    print("* Script will now GET full inventory of devices in      *");
-    print("* DNA Center.                                           *");
-    print("*                                                       *");
-    print("*         [1] Yes | [2] No or Control-C to exit         *");
-    print("*********************************************************");
+    print("*********************************************************")
+    print("* Dino | Cisco DNA Center REST API Connex               *")
+    print("*                                                       *")
+    print("* -Success! Script retreived Auth Token from DNAC.      *")
+    print("*                                                       *")
+    print("* Script will now GET full inventory of devices in      *")
+    print("* DNA Center.                                           *")
+    print("*                                                       *")
+    print("*         [1] Yes | [2] No or Control-C to exit         *")
+    print("*********************************************************")
     print("\n\n")
     choice = int(input("* Are you ready to proceed with this step? : "))
     if choice == 1:
@@ -727,31 +727,31 @@ def api_main_menu():
         "1": "AP Rename Cont'd - DNAC->CSV Comparison & Finalize", "2": "Resync Device - Force Inventory Resync on Device"}
     while True:
         print("\n\n\n")
-        print("*********************************************************");
-        print("*                                                       *");
-        print("* Dino | -ConneX-> DNA Center API Main Menu             *");
-        print("*                                                       *");
-        print("*                                                       *");
-        print("*********************************************************");
-        print("* Interact with APIs via Options Below                   ");
-        print("* Intent Menu --------                                  ");
+        print("*********************************************************")
+        print("*                                                       *")
+        print("* Dino | -ConneX-> DNA Center API Main Menu             *")
+        print("*                                                       *")
+        print("*                                                       *")
+        print("*********************************************************")
+        print("* Interact with APIs via Options Below                   ")
+        print("* Intent Menu --------                                  ")
         print("  {}                                                    ".format(label0))
         print("  [1] Browse Collected DNA Center Inventory             ")
-        print("  [2] Resync Device - Force Inventory Resync on Device  ");
+        print("  [2] Resync Device - Force Inventory Resync on Device  ")
         print("  [3] Download All Configs from Inventory Locally        ")
         #print("  [4] Add Device Manually                               ")
         #print("  [5] Start a Discovery                                 ")
         print("  [6] Add Site Hierachy                                 ")
-        print("  [9] Return to Main Menu                               ");
-        print("*********************************************************");
+        print("  [9] Return to Main Menu                               ")
+        print("*********************************************************")
         try:
             choice = int(input("* Intent Menu Choice [#] :  "))
         except ValueError as verr:
             #logging.debug("Exception occured as: " + str(verr))
             print("\n\n")
-            print("*********************************************************");
-            print("* Dino | ConneX ERROR                                   *");
-            print("*********************************************************");
+            print("*********************************************************")
+            print("* Dino | ConneX ERROR                                   *")
+            print("*********************************************************")
             print(f" ERROR                                        \n" \
                   " E                                             \n" \
                   " ERROR : Value entered is not valid,           \n" \
@@ -764,9 +764,9 @@ def api_main_menu():
         except Exception as exc:
             #logging.debug("Exception occured as: " + str(exc))
             print("\n\n")
-            print("*********************************************************");
-            print("* Dino | ConneX ERROR                                   *");
-            print("*********************************************************");
+            print("*********************************************************")
+            print("* Dino | ConneX ERROR                                   *")
+            print("*********************************************************")
             print(f" ERROR                                  \n" \
                   " E                                      \n" \
                   " ERROR : An Exception was Thrown!\n" \
@@ -784,41 +784,41 @@ def api_main_menu():
                     wifi_inv = dnac_api.wifi_inventory(wifi_inv, dnac_connArgs)
                 except Exception as exc:
                     print("\n")
-                    print("*********************************************************");
-                    print("* Dino | Cisco DNA Center REST API Connex               *");
-                    print("*********************************************************");
-                    print("*                                                       *");
-                    print("* Something went wonky and an exception got thrown      *");
-                    print("*                                                       *");
-                    print("*   Press Enter key to restart program or               *");
-                    print("*     Control-C to exit                                 *");
-                    print("*********************************************************");
+                    print("*********************************************************")
+                    print("* Dino | Cisco DNA Center REST API Connex               *")
+                    print("*********************************************************")
+                    print("*                                                       *")
+                    print("* Something went wonky and an exception got thrown      *")
+                    print("*                                                       *")
+                    print("*   Press Enter key to restart program or               *")
+                    print("*     Control-C to exit                                 *")
+                    print("*********************************************************")
                     print(exc)
                     err = input("*********************************************************")
                     continue
                 else:
                     print("\n\n\n")
-                    print("*********************************************************\n" \
-                          "* WiFi Inventory Collection was a Success!              *\n" \
-                          f"* Total WLCs: [{len(wifi_inv[0])}]                      \n" \
-                          f"* Total APs: [{len(wifi_inv[1])}]                       \n" \
+                    print("*********************************************************\n"
+                          "* WiFi Inventory Collection was a Success!              *\n"
+                          f"* Total WLCs: [{len(wifi_inv[0])}]                      \n"
+                          f"* Total APs: [{len(wifi_inv[1])}]                       \n"
                           "*********************************************************\n")
                     if len(wifi_inv[1]) == 0:
                             print("\n\n\n")
-                            print("*********************************************************");
-                            print("* Dino | Cisco DNA Center REST API Connex               *");
-                            print("*********************************************************");
-                            print("*                                                       *");
-                            print("*            Houston, we have a problem!                *");
-                            print("* No APs we were found in the inventory that Dino       *");
-                            print("* pulled from DNA Center. Printing all device \"family\"  *");
-                            print("* and \"platformIds\" in the DNAC inventory below.       *");
-                            print("* If any APs are in fact in the inventory, capture this *");
-                            print("* output and send to dev-team advising them it no worky!*");
-                            print("*                                                       *");
-                            print("* Dino will now quit to flush any data just in case.    *");
-                            print("* Press [Enter] to quit then relaunch Dino.             *");
-                            print("*********************************************************");
+                            print("*********************************************************")
+                            print("* Dino | Cisco DNA Center REST API Connex               *")
+                            print("*********************************************************")
+                            print("*                                                       *")
+                            print("*            Houston, we have a problem!                *")
+                            print("* No APs we were found in the inventory that Dino       *")
+                            print("* pulled from DNA Center. Printing all device \"family\"  *")
+                            print("* and \"platformIds\" in the DNAC inventory below.       *")
+                            print("* If any APs are in fact in the inventory, capture this *")
+                            print("* output and send to dev-team advising them it no worky!*")
+                            print("*                                                       *")
+                            print("* Dino will now quit to flush any data just in case.    *")
+                            print("* Press [Enter] to quit then relaunch Dino.             *")
+                            print("*********************************************************")
                             for item in dnac_api.dnac_inventory:
                                 print(item.get("family"))
                                 print(item.get("platformId"))
@@ -839,9 +839,9 @@ def api_main_menu():
             elif choice == 3:
                 dnac_inventory = dnac_api.dnac_inventory
                 devCnt = len(dnac_inventory)
-                print("*********************************************************");
-                print("* Dino | ConneX                                         *");
-                print("*********************************************************");
+                print("*********************************************************")
+                print("* Dino | ConneX                                         *")
+                print("*********************************************************")
                 print("Be advised. There are a total of : {} " \
                       "Devices in DNAC inventory you have requested to dump.   \n" \
                       "This could take a considerable amount of time and might \n" \
@@ -855,9 +855,9 @@ def api_main_menu():
                     api_main_menu()
                 else:
                     print("\n\n")
-                    print("*********************************************************");
-                    print("* Dino | ConneX ERROR                                   *");
-                    print("*********************************************************");
+                    print("*********************************************************")
+                    print("* Dino | ConneX ERROR                                   *")
+                    print("*********************************************************")
                     print(f" ERROR                                  \n" \
                               " E                                      \n" \
                               " ERROR : Value entered is not a valid option,\n" \
@@ -881,9 +881,9 @@ def api_main_menu():
                 break
             else:
                 print("\n\n")
-                print("*********************************************************");
-                print("* Dino | ConneX ERROR                                   *");
-                print("*********************************************************");
+                print("*********************************************************")
+                print("* Dino | ConneX ERROR                                   *")
+                print("*********************************************************")
                 print(f" ERROR                                  \n" \
                           " E                                      \n" \
                           " ERROR : Value entered is not a valid option,\n" \
@@ -902,9 +902,9 @@ def main3():
     """ changing names via SSH/CLi on WLC and adding  \n""" \
     """ them to a list. Then present matches to       \n""" \
     """ user and await confirmation b4 sending to WLC   """ 
-    print("-------------------------------------------\n" \
-          "Now we will compare CSV to CLI for MAC Address\n" \
-          " matches and validate it appears correct as expected.\n" \
+    print("-------------------------------------------\n"
+          "Now we will compare CSV to CLI for MAC Address\n"
+          " matches and validate it appears correct as expected.\n"
           "-------------------------------------------\n")
     global final_CSVresults
     global final_CLIresults
@@ -912,15 +912,15 @@ def main3():
     ap_rename20.compare(ap_rename20.final_CSVresults, ap_rename20.final_CLIresults)
     ap_rename20.matches_len = len(ap_rename20.matches)
     if ap_rename20.matches_len > 0:
-          print("-------------------------------------------\n" \
-                "Listed below are the matches found between \n" \
-                "CSV and CLI. Listed as ...                 \n" \
-                " [matched MAC, {Old AP Name, New AP Name}] \n" \
+          print("-------------------------------------------\n"
+                "Listed below are the matches found between \n"
+                "CSV and CLI. Listed as ...                 \n"
+                " [matched MAC, {Old AP Name, New AP Name}] \n"
                 "-------------------------------------------\n")
           for entry in range(len(ap_rename20.matches)):
             print(ap_rename20.matches[entry], sep=",")
     else:
-        print("No matches were found between the CSV \n" \
+        print("No matches were found between the CSV \n"
               "and CLI results.                      \n")
     choice = int(input("Does this info look correct? 1=Yes | 2=No or Ctrl-C to exit : "))
     if choice == 1:
