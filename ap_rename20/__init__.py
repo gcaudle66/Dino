@@ -1,9 +1,8 @@
-import csv
 import netmiko as nm
 from netmiko import ConnectHandler
 import textfsm
-import os
-import dnac_api
+from netmiko import ConnectHandler
+
 global final_CSVresults
 global final_CLIresults
 global final_APIresults

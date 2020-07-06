@@ -1,10 +1,12 @@
+import json
+import logging
+import time
+
 import requests
 from requests.auth import HTTPBasicAuth
-import base64
-import logging
+
 import dino
-import time
-import json
+
 requests.packages.urllib3.disable_warnings()
 global debug_status
 global dnac_token
@@ -48,14 +50,14 @@ def get_dnac_token(dnac_connArgs):
         verify=False,
         )
     except requests.exceptions.ConnectionError as exc:
-        print("*********************************************************");
-        print("* Dino | Cisco DNA Center REST API Connex               *");
-        print("*********************************************************");
-        print("*                                                       *");
-        print("* Big E...little e, what begins with E??                *");
-        print("* ERROR! Received the below error when attempting the   *");
-        print("* connection to DNA Center. Dropping back to resolve... *");
-        print("*********************************************************");
+        print("*********************************************************")
+        print("* Dino | Cisco DNA Center REST API Connex               *")
+        print("*********************************************************")
+        print("*                                                       *")
+        print("* Big E...little e, what begins with E??                *")
+        print("* ERROR! Received the below error when attempting the   *")
+        print("* connection to DNA Center. Dropping back to resolve... *")
+        print("*********************************************************")
         print(exc)
         dino.dnac_savedCreds = False
         cont = input("Press [Enter] to try again or Ctrl-C to quit")
@@ -68,24 +70,24 @@ def get_dnac_token(dnac_connArgs):
             data = token.json()
             json_data.append(data)
             dnac_token = data["Token"]
-            print("\n" \
-                  "        ##                                                \n" \
-                  "       ##  Cha-Ching!                                     \n" \
-                  "      ##     We got the Token!                            \n" \
-                  " ##  ##                                                   \n" \
-                  "  ####                                                    \n" \
-                  "   ##                  ...API Auth-Token that is          \n" \
+            print("\n"
+                  "        ##                                                \n"
+                  "       ##  Cha-Ching!                                     \n"
+                  "      ##     We got the Token!                            \n"
+                  " ##  ##                                                   \n"
+                  "  ####                                                    \n"
+                  "   ##                  ...API Auth-Token that is          \n"
                   "                                                            ")
             return dnac_token
         elif response_code == 401:
-            print("*********************************************************");
-            print("* Dino | Cisco DNA Center REST API Connex               *");
-            print("*********************************************************");
-            print("*                                                       *");
-            print("* Big E...little e, what begins with E?? ERROR!         *");
-            print("* Received 401 Unauthorized when attempting the         *");
-            print("* connection to DNA Center. Dropping back to resolve... *");
-            print("*********************************************************");
+            print("*********************************************************")
+            print("* Dino | Cisco DNA Center REST API Connex               *")
+            print("*********************************************************")
+            print("*                                                       *")
+            print("* Big E...little e, what begins with E?? ERROR!         *")
+            print("* Received 401 Unauthorized when attempting the         *")
+            print("* connection to DNA Center. Dropping back to resolve... *")
+            print("*********************************************************")
             print("\n")
             dino.dnac_savedCreds = False
             cont = input("Press [Enter] to try again or Ctrl-C to quit")
@@ -139,27 +141,27 @@ def get_dnac_inventory():
         else:
             return dnac_inventory
     elif response_code == 401:
-        print("*********************************************************");
-        print("* Dino | Cisco DNA Center REST API Connex               *");
-        print("*********************************************************");
-        print("*                                                       *");
-        print("* Big E...little e, what begins with E?? ERROR!         *");
-        print("* Received 401 Unauthorized when attempting the         *");
-        print("* connection to DNA Center. Dropping back to resolve... *");
-        print("*********************************************************");
+        print("*********************************************************")
+        print("* Dino | Cisco DNA Center REST API Connex               *")
+        print("*********************************************************")
+        print("*                                                       *")
+        print("* Big E...little e, what begins with E?? ERROR!         *")
+        print("* Received 401 Unauthorized when attempting the         *")
+        print("* connection to DNA Center. Dropping back to resolve... *")
+        print("*********************************************************")
         print("\n")
         dino.dnac_savedCreds = False
         cont = input("Press [Enter] to try again or Ctrl-C to quit")
         dino.api_main()
     else:
-        print("*********************************************************");
-        print("* Dino | Cisco DNA Center REST API Connex               *");
-        print("*********************************************************");
-        print("*                                                       *");
-        print("*            Houston, we have a problem!                *");
-        print("* Dino failed to retreive the inventory as expected     *");
-        print("* from DNA Center. Response details below.              *");
-        print("*********************************************************");
+        print("*********************************************************")
+        print("* Dino | Cisco DNA Center REST API Connex               *")
+        print("*********************************************************")
+        print("*                                                       *")
+        print("*            Houston, we have a problem!                *")
+        print("* Dino failed to retreive the inventory as expected     *")
+        print("* from DNA Center. Response details below.              *")
+        print("*********************************************************")
         print("\n")
         dino.dnac_savedCreds = False
         cont = input("Press [Enter] to try again or Ctrl-C to quit")
@@ -196,7 +198,6 @@ def gather_inv_devices():
     Here we will grab devices from the inventory with
     a subset of the keys that are relevant for the use
     """
-    import json
     temp_inv = dnac_inventory.copy()
     dnac_inv = []
     for item in range(len(dnac_inventory)):
@@ -276,7 +277,7 @@ def locate_aps(dnac_token, dnac_inventory):
             ap_count = ap_count + 1
     print(ap_inv)
     ap_found = ap_count
-    print(f"Located {ap_found} Access Points\n" \
+    print(f"Located {ap_found} Access Points\n"
           "Registered in DNA Center                     \n")
     return ap_inv
 
@@ -313,7 +314,7 @@ def locate_wlcs(dnac_token, dnac_inventory):
             wlc_count = wlc_count + 1
     print(wlc_inv)
     wlc_found = len(wlc_inv)
-    print(f"Located {wlc_found} Wireless LAN Controllers\n" \
+    print(f"Located {wlc_found} Wireless LAN Controllers\n"
           "Registered in DNA Center                     \n")
     return wlc_inv
 
@@ -342,7 +343,6 @@ def get_base(*args):
 
 
 def get_site():
-    import json
     global dnac_token
     global root_url
     global get_result_site
@@ -733,7 +733,7 @@ def enable_req_debug():
     global debug_status
     import logging
     import http.client as http_client
-    http_client.HTTPConnectionjson.debuglevel = 1
+    http_client.HTTPConnection.debuglevel = 1
     httpclient_logger = logging.getLogger("http.client")
     def httpclient_logging_patch(level=logging.DEBUG):
         """Enable HTTPConnection debug logging to the logging framework"""
@@ -768,15 +768,15 @@ def test_get_dnac_token():
         print("*     TEST FUNCTION CALLED** USED ONLY WHEN TESTING     *")
         print("*        DETECTED LOOPBACK IP AND TEST API PORT         *")
         print("*********************************************************")
-        print("* Dino | Cisco DNA Center REST API Connex               *");
-        print("*                                                       *");
-        print("* -Connection info confirmed by user.                   *");
-        print("*                                                       *");
-        print("* Script will now connect to the LOCAL TEST API SERVER  *");
-        print("* interface and retreive the TEST Authentication Token  *");
-        print("*                                                       *");
-        print("*    Press [Enter] to Continue or Control-C to exit     *");
-        print("*********************************************************");
+        print("* Dino | Cisco DNA Center REST API Connex               *")
+        print("*                                                       *")
+        print("* -Connection info confirmed by user.                   *")
+        print("*                                                       *")
+        print("* Script will now connect to the LOCAL TEST API SERVER  *")
+        print("* interface and retreive the TEST Authentication Token  *")
+        print("*                                                       *")
+        print("*    Press [Enter] to Continue or Control-C to exit     *")
+        print("*********************************************************")
         print("\n\n")
         choice = input("")
         print("*********************************************************")
@@ -792,12 +792,24 @@ def test_get_dnac_token():
             headers={'content-type': 'application/json'},
             verify=False,
             )
+        except requests.exceptions.InvalidURL:
+            print("*********************************************************")
+            print("* Dino | ConneX ERROR                                   *")
+            print("*********************************************************")
+            print("*                                                       *")
+            print("* Houston, we have a problem!                           *")
+            print("* The URL/IP provided below is invalid. Please re-enter it.*")
+            print("*********************************************************")
+            print(dnac_connArgs.get("cluster"))
+            time.sleep(3)
+            dnac_connArgs["cluster"] = input("* DNA-C Hostname/IP : ")
+            continue
         except ValueError as verr:
             #logging.debug("Exception occured as: " + str(verr))
             print("\n\n")
-            print("*********************************************************");
-            print("* Dino | ConneX ERROR                                   *");
-            print("*********************************************************");
+            print("*********************************************************")
+            print("* Dino | ConneX ERROR                                   *")
+            print("*********************************************************")
             print(f" ERROR                                  \n" \
                   " E                                      \n" \
                   " ERROR : Value entered is not valid,\n" \
@@ -810,9 +822,9 @@ def test_get_dnac_token():
         except KeyError as kerr:
             #logging.debug("Exception occured as: " + str(verr))
             print("\n\n")
-            print("*********************************************************");
-            print("* Dino | ConneX ERROR                                   *");
-            print("*********************************************************");
+            print("*********************************************************")
+            print("* Dino | ConneX ERROR                                   *")
+            print("*********************************************************")
             print(f" ERROR                                  \n" \
                   " E                                      \n" \
                   " ERROR : Key Error has occured\n" \
@@ -825,9 +837,9 @@ def test_get_dnac_token():
         except Exception as exc:
             #logging.debug("Exception occured as: " + str(exc))
             print("\n\n")
-            print("*********************************************************");
-            print("* Dino | ConneX ERROR                                   *");
-            print("*********************************************************");
+            print("*********************************************************")
+            print("* Dino | ConneX ERROR                                   *")
+            print("*********************************************************")
             print(f" ERROR                                  \n" \
                   " E                                      \n" \
                   " ERROR : An Exception was Thrown!\n" \
@@ -837,28 +849,16 @@ def test_get_dnac_token():
                   "Error Details: {}\n\n".format(exc.args, exc))
             cont = input("--> Press [Enter] to Continue or Ctrl-C to quit   \n")
             continue
-        except requests.exceptions.InvalidURL:
-            print("*********************************************************");
-            print("* Dino | ConneX ERROR                                   *");
-            print("*********************************************************");
-            print("*                                                       *");
-            print("* Houston, we have a problem!                           *");
-            print("* The URL/IP provided below is invalid. Please re-enter it.*");                        
-            print("*********************************************************")
-            print(dnac_connArgs.get("cluster"))
-            time.sleep(3)
-            dnac_connArgs["cluster"] = input("* DNA-C Hostname/IP : ")
-            continue
         else:
             data = token.json()
             dnac_token = data[1]["Token"]
-            print("\n" \
-                  "        ##                                                \n" \
-                  "       ##  Cha-Ching!                                     \n" \
-                  "      ##     We got the TEST Token!                            \n" \
-                  " ##  ##                                                   \n" \
-                  "  ####                                                    \n" \
-                  "   ##  TEST FUNCTION CALLED** USED ONLY WHEN TESTING      \n" \
+            print("\n"
+                  "        ##                                                \n"
+                  "       ##  Cha-Ching!                                     \n"
+                  "      ##     We got the TEST Token!                            \n"
+                  " ##  ##                                                   \n"
+                  "  ####                                                    \n"
+                  "   ##  TEST FUNCTION CALLED** USED ONLY WHEN TESTING      \n"
                   "                                                            ")
             print(dnac_token)
             dino.api_main2()

@@ -1,8 +1,8 @@
 ## TEST LOCAL API server with Flask
 import flask
-from flask import request, redirect, jsonify
-import json
-import test_api_data
+from flask import jsonify
+
+from test_flask_api1 import test_api_data
 
 ###### BELOW IS THE PARAMS INFO FOR FLASK.RUN()
 ###### THESE ARE PULLED FROM "../flask/app.py"

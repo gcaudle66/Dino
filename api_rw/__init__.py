@@ -1,8 +1,4 @@
-import json
 import yaml
-import os
-import sys
-
 
 
 def write_yaml(file_name, data):

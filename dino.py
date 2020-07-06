@@ -1,6 +1,8 @@
-import dnac_api
 import os
+
 import ap_rename20
+import dnac_api
+
 global dnac_savedCreds
 global dnac_connArgs
 global wifi_inv
@@ -19,6 +21,7 @@ dnac_savedCreds = False
 dnac_connArgs = {}
 session_data = []
 sandboxdnac2 = "sandboxdnac2.cisco.com"
+
 # Version and Author Info
 __version__ = "2.0"
 __author__ = "Garrett Caudle | gcaudle66@gmail.com"
@@ -58,7 +61,6 @@ class ConnexList(object):
 		self.ConnexArgs = self.setConnArgs(self)
 		return self.connexList, ConnexArgs
 	def setConnArgs(self):
-		import getpass
 		self.connexArgs = {"ip": self.connexList[0]}
 		return self.connexArgs
 	def getConnArgs(self):
@@ -480,7 +482,6 @@ def api_main():
           the WLC "hostname" and "mgmntIPAddress"
     """
     import getpass
-    import time
     global dnac_savedCreds
     global dnac_connArgs
     global test_mode
@@ -712,8 +713,6 @@ def api_main2():
 def api_main_menu():
     """
     """
-    import json
-    from dnac_api import iterate_dnac_inventory
     global test_mode
     global apRename_run
     site_list = dnac_api.dnac_site_list
@@ -955,7 +954,6 @@ class dinoLog:
 
 
 def debugy(state):
-    import logging
     import requests
     global DEBUGstatus
     import logging

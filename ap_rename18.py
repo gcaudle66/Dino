@@ -1,8 +1,13 @@
-import csv
 import netmiko as nm
 from netmiko import ConnectHandler
 import textfsm
 import os
+import os
+
+import netmiko as nm
+import textfsm
+from netmiko import ConnectHandler
+
 global final_CSVresults
 global final_CLIresults
 global conn

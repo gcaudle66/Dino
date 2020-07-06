@@ -1,6 +1,8 @@
 ## test API server with Falcon and gUnicorn HTTP server
 
-import falcon, json
+import falcon
+import json
+
 
 class CompaniesResource(object):
   companies = [{"id": 1, "name": "Company One"}, {"id": 2, "name": "Company Two"}]
