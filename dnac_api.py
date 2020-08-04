@@ -564,8 +564,7 @@ def config_dump(dnac_inventory):
     while devCnt != 0:
 
         # get the DNA C auth token
-        # ORIGINAL LINE:dnac_token = dnac_apis.get_dnac_jwt_token(DNAC_AUTH)
-        global dnac_token
+       global dnac_token
 
         temp_run_config = 'temp_run_config.txt'
 
