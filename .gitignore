@@ -1,2 +1,7 @@
 /venv/
-/misc/
+misc/
+Config_Files/
+.git/
+.git*
+.idea/
+__pycache__/
