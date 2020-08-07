@@ -566,26 +566,26 @@ def config_dump(dnac_inventory):
         # get the DNA C auth token
        global dnac_token
 
-        temp_run_config = 'temp_run_config.txt'
+       temp_run_config = 'temp_run_config.txt'
 
         # get the DNA C managed devices list (excluded wireless, for one location)
-        all_devices_info = dnac_inventory#ORIGINAL LINE:dnac_apis.get_all_device_info(dnac_token)
-        all_devices_hostnames = []
-        for device in all_devices_info:
-            print(device['hostname'])
-            all_devices_hostnames.append(device['hostname'])
+       all_devices_info = dnac_inventory#ORIGINAL LINE:dnac_apis.get_all_device_info(dnac_token)
+       all_devices_hostnames = []
+       for device in all_devices_info:
+           print(device['hostname'])
+           all_devices_hostnames.append(device['hostname'])
 ##        for device in all_devices_info:
 ##            if device['family'] == 'Switches and Hubs' or device['family'] == 'Routers':
 ##                if 'CSR1Kv' in device['hostname'] or 'NYC' in device['hostname']:
 ##                    all_devices_hostnames.append(device['hostname'])
 
         # get the config files, compare with existing (if one existing). Save new config if file not existing.
-        for device in all_devices_info:
-            t = time.localtime()
-            deviceId = device["id"]
-            tStamp = str("{}{}{}{}{}".format(t.tm_mon, t.tm_mday, t.tm_year, t.tm_hour, t.tm_min))
-            device_run_config = get_output_command_runner('show running-config', deviceId, dnac_token)
-            filename = str(device["hostname"]) + '_' + tStamp + '_run_config.txt'
+       for device in all_devices_info:
+           t = time.localtime()
+           deviceId = device["id"]
+           tStamp = str("{}{}{}{}{}".format(t.tm_mon, t.tm_mday, t.tm_year, t.tm_hour, t.tm_min))
+           device_run_config = get_output_command_runner('show running-config', deviceId, dnac_token)
+           filename = str(device["hostname"]) + '_' + tStamp + '_run_config.txt'
 
             # save the running config to a temp file
 ##
@@ -594,10 +594,10 @@ def config_dump(dnac_inventory):
 ##            f_temp.seek(0)  # reset the file pointer to 0
 ##            f_temp.close()
 
-            f_config = open(filename, 'w')
-            f_config.write(device_run_config)
-            f_config.seek(0)
-            f_config.close()
+           f_config = open(filename, 'w')
+           f_config.write(device_run_config)
+           f_config.seek(0)
+           f_config.close()
 ##
 ##            # retrieve the device management IP address
 ##            device_mngmnt_ip_address = dnac_apis.get_device_management_ip(device, dnac_token)
@@ -608,8 +608,8 @@ def config_dump(dnac_inventory):
 ##            netconf_restconf.netconf_save_running_config_to_file('flash:/config_mon_baseline', device_mngmnt_ip_address,
 ##                                                                IOS_XE_PORT, IOS_XE_USER, IOS_XE_PASS)
 ##
-            print('Device Config Saved : ' + device["hostname"] + ' - as ' + filename)
-            devCnt = devCnt - 1
+           print('Device Config Saved : ' + device["hostname"] + ' - as ' + filename)
+           devCnt = devCnt - 1
     results = str("Config Dump Complete. Number of Configs Processed: {}".format(len(all_devices_hostnames)))
     return results
 
