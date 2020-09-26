@@ -108,3 +108,23 @@ class AcPo:
             """
 
 
+class ConnexList(object):
+	def __init__(self, match_list):
+		self.connexList = match_list
+		self.connexArgs = {}
+		self.sendCmds = []
+	def __enter__(self):
+		self.connexList = match_list.copy()
+		self.ConnexArgs = self.setConnArgs(self)
+		return self.connexList, ConnexArgs
+	def setConnArgs(self):
+		import getpass
+		self.connexArgs = {"ip": self.connexList[0]}
+		return self.connexArgs
+	def getConnArgs(self):
+		self.getConnArgs = print(self.connexArgs)
+	def getCmds(self):
+		self.sendCmds = ap_rename20.api_create_commands(connexList)
+		return self.sendCmds
+	def __exit__(self):
+		self.connexList.clear()
