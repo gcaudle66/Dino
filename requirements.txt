@@ -62,7 +62,7 @@ sqlparse==0.3.1
 terminal==0.4.0
 textfsm==1.1.0
 typing-extensions==3.7.4.1
-urllib3==1.25.8
+urllib3==1.26.5
 vobject==0.9.6.1
 Werkzeug==1.0.1
 xmltodict==0.12.0
